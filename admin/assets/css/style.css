@@ -1,0 +1,209 @@
+/* Main Styles for Artist Dashboard */
+
+/* Global Styles */
+:root {
+  --primary: #4e73df;
+  --secondary: #858796;
+  --success: #1cc88a;
+  --info: #36b9cc;
+  --warning: #f6c23e;
+  --danger: #e74a3b;
+  --light: #f8f9fc;
+  --dark: #5a5c69;
+  --sidebar-width: 250px;
+}
+
+body {
+  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8f9fc;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: #4e73df;
+  background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+  background-size: cover;
+  min-height: 100vh;
+  position: fixed;
+  z-index: 1;
+}
+
+.sidebar .nav-item {
+  position: relative;
+}
+
+.sidebar .nav-item .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar .nav-item .nav-link:hover {
+  color: #fff;
+}
+
+.sidebar .nav-item .nav-link.active {
+  color: #fff;
+  font-weight: 700;
+}
+
+.sidebar .nav-item .nav-link i,
+.sidebar .nav-item .nav-link svg {
+  margin-right: 0.5rem;
+}
+
+/* Card Styles */
+.card {
+  margin-bottom: 24px;
+  border: none;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.card .card-header {
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+}
+
+.card-header h6 {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #4e73df;
+}
+
+/* Border Left Cards */
+.border-left-primary {
+  border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+  border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+  border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+  border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-danger {
+  border-left: 0.25rem solid #e74a3b !important;
+}
+
+/* Text Colors */
+.text-primary {
+  color: #4e73df !important;
+}
+
+.text-success {
+  color: #1cc88a !important;
+}
+
+.text-info {
+  color: #36b9cc !important;
+}
+
+.text-warning {
+  color: #f6c23e !important;
+}
+
+.text-danger {
+  color: #e74a3b !important;
+}
+
+.text-gray-300 {
+  color: #dddfeb !important;
+}
+
+.text-gray-800 {
+  color: #5a5c69 !important;
+}
+
+/* Artwork Grid */
+.artwork-thumbnail {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Messages */
+.message-bubble {
+  max-width: 75%;
+}
+
+.message-sent {
+  margin-left: auto;
+}
+
+.message-received {
+  margin-right: auto;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: relative;
+    min-height: auto;
+  }
+
+  .col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+}
+
+/* Chart Containers */
+.chart-area {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.chart-pie {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Print Styles */
+@media print {
+  .sidebar,
+  .navbar,
+  .btn,
+  form,
+  .no-print {
+    display: none !important;
+  }
+
+  .col-md-9.ms-sm-auto.col-lg-10.px-md-4 {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+

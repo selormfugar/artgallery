@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#f5f5f5"/>
+  
+  <!-- Header -->
+  <rect width="1000" height="60" fill="#222222"/>
+  <text x="30" y="38" font-family="Arial" font-size="22" fill="white">ArtMarket</text>
+  <text x="120" y="38" font-family="Arial" font-size="18" fill="#ff9800">Admin</text>
+  <circle cx="950" cy="30" r="20" fill="#666666"/>
+  <text x="945" y="38" font-family="Arial" font-size="18" fill="white" text-anchor="middle">A</text>
+  <rect x="850" y="18" width="80" height="25" rx="12" fill="#666666"/>
+  <text x="890" y="36" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Logout</text>
+  
+  <!-- Sidebar -->
+  <rect width="200" height="640" y="60" fill="#333333"/>
+  <text x="100" y="95" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Admin Dashboard</text>
+  
+  <!-- Sidebar Menu Items -->
+  <rect width="180" height="40" x="10" y="120" rx="5" fill="#666666"/>
+  <text x="40" y="145" font-family="Arial" font-size="14" fill="white">Dashboard</text>
+  
+  <rect width="180" height="40" x="10" y="170" rx="5" fill="#444444"/>
+  <text x="40" y="195" font-family="Arial" font-size="14" fill="white">User Management</text>
+  
+  <rect width="180" height="40" x="10" y="220" rx="5" fill="#444444"/>
+  <text x="40" y="245" font-family="Arial" font-size="14" fill="white">Artwork Moderation</text>
+  
+  <rect width="180" height="40" x="10" y="270" rx="5" fill="#444444"/>
+  <text x="40" y="295" font-family="Arial" font-size="14" fill="white">Reports/Analytics</text>
+  
+  <rect width="180" height="40" x="10" y="320" rx="5" fill="#444444"/>
+  <text x="40" y="345" font-family="Arial" font-size="14" fill="white">Transactions</text>
+  
+  <rect width="180" height="40" x="10" y="370" rx="5" fill="#444444"/>
+  <text x="40" y="395" font-family="Arial" font-size="14" fill="white">Flagged Content</text>
+  
+  <rect width="180" height="40" x="10" y="420" rx="5" fill="#444444"/>
+  <text x="40" y="445" font-family="Arial" font-size="14" fill="white">System Settings</text>
+  
+  <!-- Main Content Area -->
+  <!-- Platform Stats Cards -->
+  <rect width="230" height="110" x="230" y="90" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="345" y="120" font-family="Arial" font-size="16" fill="#333333" text-anchor="middle">Total Users</text>
+  <text x="345" y="160" font-family="Arial" font-size="30" fill="#333333" text-anchor="middle">15,748</text>
+  <text x="345" y="180" font-family="Arial" font-size="14" fill="#4CAF50" text-anchor="middle">↑ 4.2% this week</text>
+  
+  <rect width="230" height="110" x="485" y="90" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="600" y="120" font-family="Arial" font-size="16" fill="#333333" text-anchor="middle">Active Listings</text>
+  <text x="600" y="160" font-family="Arial" font-size="30" fill="#333333" text-anchor="middle">32,167</text>
+  <text x="600" y="180" font-family="Arial" font-size="14" fill="#4CAF50" text-anchor="middle">↑ 2.8% this week</text>
+  
+  <rect width="230" height="110" x="740" y="90" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="855" y="120" font-family="Arial" font-size="16" fill="#333333" text-anchor="middle">Revenue</text>
+  <text x="855" y="160" font-family="Arial" font-size="30" fill="#333333" text-anchor="middle">$42,893</text>
+  <text x="855" y="180" font-family="Arial" font-size="14" fill="#F44336" text-anchor="middle">↓ 1.5% this week</text>
+  
+  <!-- Content Requiring Moderation -->
+  <rect width="360" height="250" x="230" y="220" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="250" y="250" font-family="Arial" font-size="18" font-weight="bold" fill="#333333">Pending Moderation</text>
+  
+  <!-- Moderation List -->
+  <rect width="340" height="40" x="240" y="265" fill="#f0f0f0"/>
+  <text x="255" y="290" font-family="Arial" font-size="14" fill="#555555">Item</text>
+  <text x="400" y="290" font-family="Arial" font-size="14" fill="#555555">Type</text>
+  <text x="490" y="290" font-family="Arial" font-size="14" fill="#555555">Submitted</text>
+  
+  <!-- Items -->
+  <line x1="240" y1="305" x2="580" y2="305" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="40" height="30" x="245" y="315" rx="3" fill="#eeeeee"/>
+  <text x="320" y="335" font-family="Arial" font-size="14" fill="#333333">Abstract #42</text>
+  <text x="400" y="335" font-family="Arial" font-size="14" fill="#333333">Artwork</text>
+  <text x="490" y="335" font-family="Arial" font-size="14" fill="#333333">10 mins ago</text>
+  
+  <line x1="240" y1="345" x2="580" y2="345" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="40" height="30" x="245" y="355" rx="3" fill="#eeeeee"/>
+  <text x="320" y="375" font-family="Arial" font-size="14" fill="#333333">User Profile</text>
+  <text x="400" y="375" font-family="Arial" font-size="14" fill="#333333">Account</text>
+  <text x="490" y="375" font-family="Arial" font-size="14" fill="#333333">15 mins ago</text>
+  
+  <line x1="240" y1="385" x2="580" y2="385" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="40" height="30" x="245" y="395" rx="3" fill="#eeeeee"/>
+  <text x="320" y="415" font-family="Arial" font-size="14" fill="#333333">Sunset Painting</text>
+  <text x="400" y="415" font-family="Arial" font-size="14" fill="#333333">Artwork</text>
+  <text x="490" y="415" font-family="Arial" font-size="14" fill="#333333">36 mins ago</text>
+  
+  <!-- Flagged Content -->
+  <rect width="360" height="250" x="610" y="220" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="630" y="250" font-family="Arial" font-size="18" font-weight="bold" fill="#333333">Flagged Content</text>
+  
+  <!-- Flagged Content List -->
+  <rect width="340" height="40" x="620" y="265" fill="#f0f0f0"/>
+  <text x="635" y="290" font-family="Arial" font-size="14" fill="#555555">Item</text>
+  <text x="780" y="290" font-family="Arial" font-size="14" fill="#555555">Reason</text>
+  <text x="870" y="290" font-family="Arial" font-size="14" fill="#555555">Reports</text>
+  
+  <!-- Items -->
+  <line x1="620" y1="305" x2="960" y2="305" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="40" height="30" x="625" y="315" rx="3" fill="#eeeeee"/>
+  <text x="700" y="335" font-family="Arial" font-size="14" fill="#333333">Cityscape</text>
+  <text x="780" y="335" font-family="Arial" font-size="14" fill="#F44336">Copyright</text>
+  <rect width="30" height="20" x="870" y="323" rx="10" fill="#F44336"/>
+  <text x="885" y="337" font-family="Arial" font-size="12" fill="white" text-anchor="middle">3</text>
+  
+  <line x1="620" y1="345" x2="960" y2="345" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="40" height="30" x="625" y="355" rx="3" fill="#eeeeee"/>
+  <text x="700" y="375" font-family="Arial" font-size="14" fill="#333333">User Comment</text>
+  <text x="780" y="375" font-family="Arial" font-size="14" fill="#F44336">Inappropriate</text>
+  <rect width="30" height="20" x="870" y="363" rx="10" fill="#F44336"/>
+  <text x="885" y="377" font-family="Arial" font-size="12" fill="white" text-anchor="middle">2</text>
+  
+  <line x1="620" y1="385" x2="960" y2="385" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="40" height="30" x="625" y="395" rx="3" fill="#eeeeee"/>
+  <text x="700" y="415" font-family="Arial" font-size="14" fill="#333333">Profile Picture</text>
+  <text x="780" y="415" font-family="Arial" font-size="14" fill="#F44336">Spam</text>
+  <rect width="30" height="20" x="870" y="403" rx="10" fill="#F44336"/>
+  <text x="885" y="417" font-family="Arial" font-size="12" fill="white" text-anchor="middle">5</text>
+  
+  <!-- System Status & Analytics -->
+  <rect width="740" height="210" x="230" y="490" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="250" y="520" font-family="Arial" font-size="18" font-weight="bold" fill="#333333">Platform Analytics</text>
+  
+  <!-- Analytics Graph -->
+  <polyline points="250,640 310,600 370,620 430,580 490,540 550,560 610,520 670,500 730,530 790,480 850,510 910,470

@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#f5f5f5"/>
+  
+  <!-- Header -->
+  <rect width="1000" height="60" fill="#333333"/>
+  <text x="30" y="38" font-family="Arial" font-size="22" fill="white">ArtMarket</text>
+  <circle cx="950" cy="30" r="20" fill="#666666"/>
+  <text x="945" y="38" font-family="Arial" font-size="18" fill="white" text-anchor="middle">A</text>
+  <rect x="850" y="18" width="80" height="25" rx="12" fill="#666666"/>
+  <text x="890" y="36" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Logout</text>
+  
+  <!-- Sidebar -->
+  <rect width="200" height="640" y="60" fill="#444444"/>
+  <text x="100" y="95" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Artist Dashboard</text>
+  
+  <!-- Sidebar Menu Items -->
+  <rect width="180" height="40" x="10" y="120" rx="5" fill="#555555"/>
+  <text x="40" y="145" font-family="Arial" font-size="14" fill="white">Dashboard</text>
+  
+  <rect width="180" height="40" x="10" y="170" rx="5" fill="#666666"/>
+  <text x="40" y="195" font-family="Arial" font-size="14" fill="white">Upload Artwork</text>
+  
+  <rect width="180" height="40" x="10" y="220" rx="5" fill="#555555"/>
+  <text x="40" y="245" font-family="Arial" font-size="14" fill="white">My Artworks</text>
+  
+  <rect width="180" height="40" x="10" y="270" rx="5" fill="#555555"/>
+  <text x="40" y="295" font-family="Arial" font-size="14" fill="white">Sales Overview</text>
+  
+  <rect width="180" height="40" x="10" y="320" rx="5" fill="#555555"/>
+  <text x="40" y="345" font-family="Arial" font-size="14" fill="white">Messages</text>
+  
+  <rect width="180" height="40" x="10" y="370" rx="5" fill="#555555"/>
+  <text x="40" y="395" font-family="Arial" font-size="14" fill="white">Account Settings</text>
+  
+  <!-- Main Content Area -->
+  <!-- Dashboard Stats -->
+  <rect width="740" height="100" x="230" y="90" rx="10" fill="white" stroke="#dddddd"/>
+  <rect width="230" height="90" x="240" y="95" rx="5" fill="#f9f9f9"/>
+  <text x="355" y="125" font-family="Arial" font-size="16" fill="#333333" text-anchor="middle">Views</text>
+  <text x="355" y="160" font-family="Arial" font-size="24" fill="#333333" text-anchor="middle">1,245</text>
+  
+  <rect width="230" height="90" x="485" y="95" rx="5" fill="#f9f9f9"/>
+  <text x="600" y="125" font-family="Arial" font-size="16" fill="#333333" text-anchor="middle">Sales</text>
+  <text x="600" y="160" font-family="Arial" font-size="24" fill="#333333" text-anchor="middle">14</text>
+  
+  <rect width="230" height="90" x="730" y="95" rx="5" fill="#f9f9f9"/>
+  <text x="845" y="125" font-family="Arial" font-size="16" fill="#333333" text-anchor="middle">Revenue</text>
+  <text x="845" y="160" font-family="Arial" font-size="24" fill="#333333" text-anchor="middle">$1,860</text>
+  
+  <!-- Recent Sales -->
+  <rect width="360" height="320" x="230" y="210" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="250" y="240" font-family="Arial" font-size="18" font-weight="bold" fill="#333333">Recent Sales</text>
+  
+  <!-- Sales Table -->
+  <rect width="340" height="40" x="240" y="255" fill="#f0f0f0"/>
+  <text x="255" y="280" font-family="Arial" font-size="14" fill="#555555">Artwork</text>
+  <text x="430" y="280" font-family="Arial" font-size="14" fill="#555555">Date</text>
+  <text x="530" y="280" font-family="Arial" font-size="14" fill="#555555">Amount</text>
+  
+  <!-- Table Rows -->
+  <line x1="240" y1="295" x2="580" y2="295" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="50" height="40" x="245" y="305" rx="3" fill="#eeeeee"/>
+  <text x="325" y="330" font-family="Arial" font-size="14" fill="#333333">Ocean Sunset</text>
+  <text x="430" y="330" font-family="Arial" font-size="14" fill="#333333">Mar 15, 2025</text>
+  <text x="530" y="330" font-family="Arial" font-size="14" fill="#333333">$250</text>
+  
+  <line x1="240" y1="345" x2="580" y2="345" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="50" height="40" x="245" y="355" rx="3" fill="#eeeeee"/>
+  <text x="325" y="380" font-family="Arial" font-size="14" fill="#333333">City Lights</text>
+  <text x="430" y="380" font-family="Arial" font-size="14" fill="#333333">Mar 12, 2025</text>
+  <text x="530" y="380" font-family="Arial" font-size="14" fill="#333333">$180</text>
+  
+  <line x1="240" y1="395" x2="580" y2="395" stroke="#e0e0e0" stroke-width="1"/>
+  <rect width="50" height="40" x="245" y="405" rx="3" fill="#eeeeee"/>
+  <text x="325" y="430" font-family="Arial" font-size="14" fill="#333333">Mystic Forest</text>
+  <text x="430" y="430" font-family="Arial" font-size="14" fill="#333333">Mar 8, 2025</text>
+  <text x="530" y="430" font-family="Arial" font-size="14" fill="#333333">$310</text>
+  
+  <!-- Analytics Graph -->
+  <rect width="360" height="320" x="610" y="210" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="630" y="240" font-family="Arial" font-size="18" font-weight="bold" fill="#333333">Performance</text>
+  
+  <!-- Sample Graph -->
+  <polyline points="640,420 670,380 700,400 730,340 760,320 790,350 820,300 850,290 880,270 910,310" 
+            fill="none" stroke="#4CAF50" stroke-width="3"/>
+  <line x1="640" y1="450" x2="920" y2="450" stroke="#dddddd" stroke-width="1"/>
+  <line x1="640" y1="270" x2="640" y2="450" stroke="#dddddd" stroke-width="1"/>
+  
+  <!-- Upcoming Events/Tasks -->
+  <rect width="740" height="120" x="230" y="550" rx="10" fill="white" stroke="#dddddd"/>
+  <text x="250" y="580" font-family="Arial" font-size="18" font-weight="bold" fill="#333333">Upcoming Tasks</text>
+  
+  <!-- Task Items -->
+  <rect width="20" height="20" x="245" y="600" rx="3" fill="white" stroke="#dddddd"/>
+  <text x="275" y="615" font-family="Arial" font-size="14" fill="#333333">Complete profile information</text>
+  
+  <rect width="20" height="20" x="245" y="630" rx="3" fill="white" stroke="#dddddd" stroke-width="1"/>
+  <text x="275" y="645" font-family="Arial" font-size="14" fill="#333333">Upload 2 new artworks this week</text>
+  
+  <rect width="20" height="20" x="455" y="600" rx="3" fill="white" stroke="#dddddd"/>
+  <text x="485" y="615" font-family="Arial" font-size="14" fill="#333333">Respond to buyer inquiry</text>
+  
+  <rect width="20" height="20" x="455" y="630" rx="3" fill="white" stroke="#dddddd" stroke-width="1"/>
+  <text x="485" y="645" font-family="Arial" font-size="14" fill="#333333">Update artwork descriptions</text>
+</svg>
