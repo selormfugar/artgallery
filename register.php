@@ -186,7 +186,9 @@ if (!isset($_SESSION['csrf_token'])) {
 
         function closeModal() {
             document.getElementById("registerModal").style.display = "none";
+            history.back(); // This will redirect to the previous page
         }
+        
 
         function toggleMode() {
             document.body.classList.toggle("light-mode");

@@ -5,10 +5,6 @@
 $isLoggedIn = isset($_SESSION['user_id']);
 $currentRole = $_SESSION['role'] ?? 'guest'; // Default to guest if not set
 
-
-
-
-
 ?>
 
 <nav class="nav-menu">
@@ -27,7 +23,7 @@ $currentRole = $_SESSION['role'] ?? 'guest'; // Default to guest if not set
             <!-- Logged-in User Links -->
             <a href="auction.php">Auctions</a>
             <a href="shop.php">Shop</a>
-            <a href="events.php">Events</a>
+            <!-- <a href="events.php">Events</a> -->
             <a href="subscription.php">Subscription</a>
         <?php else: ?>
             <!-- Guest Links -->
@@ -61,61 +57,14 @@ $currentRole = $_SESSION['role'] ?? 'guest'; // Default to guest if not set
         <?php endif; ?>
         
         <!-- Theme Toggle -->
-        <button onclick="toggleMode()" class="theme-toggle px-4 py-2 rounded hover:bg-gray-200">
-            <i class="fas fa-moon mr-2"></i>Theme
-        </button>
+        <button onclick="toggleDarkMode()" class="ml-4 p-2 rounded-full focus:outline-none">
+  <svg id="light-icon" class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+  </svg>
+  <svg id="dark-icon" class="w-6 h-6 text-gray-200 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+  </svg>
+</button>
     </div>
 </nav>
-<!-- <style>
-    .nav-menu {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .main-links {
-        display: flex;
-        gap: 1.5rem;
-    }
-    
-    .main-links a {
-        padding: 0.5rem 0;
-        transition: color 0.3s;
-    }
-    
-    .main-links a:hover {
-        color: #3b82f6;
-    }
-    
-    .user-controls {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    a {
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .register-btn {
-        transition: background-color 0.3s;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .nav-menu {
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .main-links, .user-controls {
-            width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-    }
-</style>
+  

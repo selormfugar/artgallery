@@ -171,6 +171,7 @@
 
         function closeLoginModal() {
             document.getElementById("loginModal").style.display = "none";
+            history.back(); // This will redirect to the previous page
         }
 
         function toggleMode() {

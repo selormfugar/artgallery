@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 01, 2025 at 01:55 PM
+-- Generation Time: Apr 04, 2025 at 04:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,6 +61,35 @@ INSERT INTO `artists` (`artist_id`, `user_id`, `bio`, `profile_picture`, `social
 (3, 3, 'Digital artist working with surreal themes.', 'profile3.jpg', '{\"website\": \"artist3.com\"}', 0),
 (4, 4, 'Minimalist sculptor creating small-scale pieces.', 'profile4.jpg', '{\"linkedin\": \"artist4\"}', 0),
 (5, 5, 'Street artist blending graffiti and fine art.', 'profile5.jpg', '{\"instagram\": \"@artist5\"}', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `artist_subscription_settings`
+--
+
+CREATE TABLE `artist_subscription_settings` (
+  `setting_id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  `tier_id` int(11) NOT NULL,
+  `is_enabled` tinyint(1) DEFAULT 0,
+  `custom_description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `archived` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `artist_subscription_settings`
+--
+
+INSERT INTO `artist_subscription_settings` (`setting_id`, `artist_id`, `tier_id`, `is_enabled`, `custom_description`, `created_at`, `updated_at`, `archived`) VALUES
+(1, 2, 2, 1, 'Subscribe to get 15% off all my artworks plus early access to new collections', '2025-04-04 12:19:07', '2025-04-04 12:22:04', 0),
+(2, 2, 5, 1, 'Annual subscribers get exclusive behind-the-scenes content and 18% off all purchases', '2025-04-04 12:19:07', '2025-04-04 12:22:04', 0),
+(3, 2, 8, 1, 'Become a lifetime patron and enjoy 25% off forever plus personalized thank you sketch', '2025-04-04 12:19:07', '2025-04-04 12:22:04', 0),
+(4, 19, 8, 1, 'Become a lifetime patron and enjoy 25% off forever plus personalized thank you sketch', '2025-04-04 12:19:07', '2025-04-04 12:22:04', 0),
+(5, 19, 5, 1, 'Annual subscribers get exclusive behind-the-scenes content and 18% off all purchases', '2025-04-04 12:19:07', '2025-04-04 12:22:04', 0),
+(6, 19, 2, 1, 'Subscribe to get 15% off all my artworks plus early access to new collections', '2025-04-04 12:19:07', '2025-04-04 12:22:04', 0);
 
 -- --------------------------------------------------------
 
@@ -204,7 +233,11 @@ CREATE TABLE `collection_folders` (
 --
 
 INSERT INTO `collection_folders` (`folder_id`, `user_id`, `folder_name`, `description`, `is_public`, `created_at`, `updated_at`, `archived`) VALUES
-(1, 3, 'Abstract Art', 'My favorite abstract pieces', 0, '2025-04-01 11:42:44', '2025-04-01 11:42:44', 0);
+(1, 3, 'Abstract Art', 'My favorite abstract pieces', 0, '2025-04-01 11:42:44', '2025-04-01 11:42:44', 0),
+(2, 18, 'Abstract Art', 'My favorite abstract pieces', 0, '2025-04-01 11:42:44', '2025-04-01 11:42:44', 0),
+(3, 18, 'Trial', 'Nice', 0, '2025-04-01 12:48:26', '2025-04-01 12:48:26', 0),
+(4, 18, 'Trial', 'Nice', 0, '2025-04-01 12:48:39', '2025-04-01 12:48:39', 0),
+(5, 18, 'second trial', 'trial', 0, '2025-04-01 12:49:04', '2025-04-01 12:49:04', 0);
 
 -- --------------------------------------------------------
 
@@ -307,19 +340,31 @@ CREATE TABLE `orders` (
   `total_price` decimal(10,2) NOT NULL,
   `payment_status` enum('pending','completed','failed') DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `archived` tinyint(1) DEFAULT 0
+  `archived` tinyint(1) DEFAULT 0,
+  `subscription_discount` decimal(10,2) DEFAULT 0.00,
+  `is_subscription_cancellation` tinyint(1) DEFAULT 0,
+  `applied_subscription_id` int(11) DEFAULT NULL,
+  `subscription_plan_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `buyer_id`, `artwork_id`, `is_auction_sale`, `auction_id`, `total_price`, `payment_status`, `created_at`, `archived`) VALUES
-(1, 3, 1, 0, NULL, 500.00, 'completed', '2025-03-20 09:18:23', 0),
-(2, 4, 2, 0, NULL, 750.00, 'completed', '2025-03-20 09:18:23', 0),
-(3, 3, 3, 0, NULL, 300.00, 'pending', '2025-03-20 09:18:23', 0),
-(4, 4, 4, 0, NULL, 1200.00, 'failed', '2025-03-20 09:18:23', 0),
-(5, 3, 5, 0, NULL, 450.00, 'completed', '2025-03-20 09:18:23', 0);
+INSERT INTO `orders` (`order_id`, `buyer_id`, `artwork_id`, `is_auction_sale`, `auction_id`, `total_price`, `payment_status`, `created_at`, `archived`, `subscription_discount`, `is_subscription_cancellation`, `applied_subscription_id`, `subscription_plan_id`) VALUES
+(1, 3, 1, 0, NULL, 500.00, 'completed', '2025-03-20 09:18:23', 0, 0.00, 0, NULL, NULL),
+(2, 4, 2, 0, NULL, 750.00, 'completed', '2025-03-20 09:18:23', 0, 0.00, 0, NULL, NULL),
+(3, 3, 3, 0, NULL, 300.00, 'pending', '2025-03-20 09:18:23', 0, 0.00, 0, NULL, NULL),
+(4, 4, 4, 0, NULL, 1200.00, 'failed', '2025-03-20 09:18:23', 0, 0.00, 0, NULL, NULL),
+(5, 3, 5, 0, NULL, 450.00, 'completed', '2025-03-20 09:18:23', 0, 0.00, 0, NULL, NULL),
+(6, 18, 12, 0, NULL, 450.00, 'completed', '2025-04-01 09:18:23', 0, 0.00, 0, NULL, NULL),
+(7, 18, 7, 0, NULL, 450.00, 'completed', '2025-04-01 09:18:23', 0, 0.00, 0, NULL, NULL),
+(8, 18, 2, 0, NULL, 500.00, 'completed', '2025-04-01 09:18:23', 0, 0.00, 0, NULL, NULL),
+(9, 18, 1, 0, NULL, 500.00, 'completed', '2025-04-01 09:18:23', 0, 0.00, 0, NULL, NULL),
+(10, 18, 11, 0, NULL, 500.00, 'completed', '2025-04-01 09:18:23', 0, 0.00, 0, NULL, NULL),
+(11, 18, NULL, 0, NULL, 0.00, 'pending', '2025-04-04 13:14:27', 0, 0.00, 0, NULL, 3),
+(12, 18, NULL, 0, NULL, 0.00, 'pending', '2025-04-04 13:18:13', 0, 0.00, 0, NULL, 1),
+(13, 18, NULL, 0, NULL, 0.00, 'pending', '2025-04-04 14:30:30', 0, 0.00, 0, NULL, 4);
 
 -- --------------------------------------------------------
 
@@ -334,6 +379,24 @@ CREATE TABLE `payments` (
   `payment_gateway` enum('Stripe','PayPal','Flutterwave') DEFAULT NULL,
   `status` enum('pending','successful','failed') DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `portfolio_items`
+--
+
+CREATE TABLE `portfolio_items` (
+  `item_id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `image_url` varchar(255) NOT NULL,
+  `category` varchar(100) DEFAULT NULL,
+  `tags` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `archived` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -368,6 +431,62 @@ CREATE TABLE `reviews` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `subscription_plans`
+--
+
+CREATE TABLE `subscription_plans` (
+  `plan_id` int(11) NOT NULL,
+  `artist_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `duration_type` enum('monthly','yearly','lifetime') NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `discount_percentage` decimal(5,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `archived` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subscription_plans`
+--
+
+INSERT INTO `subscription_plans` (`plan_id`, `artist_id`, `name`, `description`, `duration_type`, `price`, `discount_percentage`, `created_at`, `updated_at`, `archived`) VALUES
+(1, 2, 'kwame', 'wet', 'monthly', 20.00, 2.00, '2025-04-04 12:13:59', '2025-04-04 12:31:59', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subscription_tiers`
+--
+
+CREATE TABLE `subscription_tiers` (
+  `tier_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `duration_type` enum('monthly','yearly','lifetime') NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `discount_percentage` decimal(5,2) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subscription_tiers`
+--
+
+INSERT INTO `subscription_tiers` (`tier_id`, `name`, `description`, `duration_type`, `price`, `discount_percentage`, `is_active`) VALUES
+(1, 'Basic Monthly', 'Basic monthly subscription with exclusive discounts', 'monthly', 4.99, 10.00, 1),
+(2, 'Premium Monthly', 'Premium monthly subscription with better discounts and early access', 'monthly', 9.99, 15.00, 1),
+(3, 'VIP Monthly', 'VIP monthly subscription with maximum monthly benefits', 'monthly', 14.99, 20.00, 1),
+(4, 'Basic Annual', 'Basic annual subscription - save compared to monthly', 'yearly', 49.99, 12.00, 1),
+(5, 'Premium Annual', 'Premium annual subscription with enhanced benefits', 'yearly', 99.99, 18.00, 1),
+(6, 'VIP Annual', 'VIP annual subscription with maximum yearly benefits', 'yearly', 149.99, 25.00, 1),
+(7, 'Lifetime Supporter', 'One-time payment for lifetime basic discounts', 'lifetime', 199.99, 15.00, 1),
+(8, 'Lifetime Patron', 'One-time payment for lifetime premium benefits', 'lifetime', 299.99, 25.00, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -379,28 +498,29 @@ CREATE TABLE `users` (
   `password_hash` varchar(255) NOT NULL,
   `role` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `archived` tinyint(1) DEFAULT 0
+  `archived` tinyint(1) DEFAULT 0,
+  `profile_image` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `firstname`, `lastname`, `email`, `password_hash`, `role`, `created_at`, `archived`) VALUES
-(1, 'artist1', 'artist1', 'artist1@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'artist', '2025-03-20 09:17:05', 0),
-(2, 'artist2', 'artist1', 'artist2@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'artist', '2025-03-20 09:17:05', 0),
-(3, 'buyer1', 'artist1', 'buyer1@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'buyer', '2025-03-20 09:17:05', 0),
-(4, 'buyer2', 'artist1', 'buyer2@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'buyer', '2025-03-20 09:17:05', 0),
-(5, 'admin1', 'artist1', 'admin1@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'admin', '2025-03-20 09:17:05', 0),
-(7, 'kwame', 'kwame', 'kwame@gmail.com', '$2y$10$/yslo.JecxuCcEEfcz5lqO3a4W2cBCZLWsONnGWnwac6sAsHKBd2G', 'buyer', '2025-03-23 13:58:45', 0),
-(9, 'kwame', 'kwame', 'kwame11@gmail.com', '$2y$10$UHhCIO00EjOLJQzfHVb0zu2HTx1xvzmOJBu3ltABCZTohrLVE564.', 'artist', '2025-03-23 14:03:42', 0),
-(11, 'kwame', 'kwamena', 'kwamena12@s.com', '$2y$10$C5ci44DEcUwPuzmE790sCuD8A0XcdD2jit9SS4K1Ur4DyBYjClthi', 'buyer', '2025-03-23 14:05:33', 0),
-(12, 'qwe', 'qwe', 'q@gmail.com', '$2y$10$F3BtdXA.dfesNLW.zfyRZePlU01ku.2vtwEprK9xQtD2EDpaNpYda', 'buyer', '2025-03-23 14:10:00', 0),
-(14, 'adwoa', 'mansa', 'amanas@gmail.com', '$2y$10$fPxYbDhxjege1z3rPfZov.AqVvnzx7WQUjO8SHk7NGSapjPRPT8he', 'buyer', '2025-03-23 14:16:21', 0),
-(15, 'artist', '12', 'artist12@gmail.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'buyer', '2025-03-23 14:24:08', 0),
-(17, 'w', 'w', 'admi@example.com', '$2y$10$BtgB7uKZnR9nOJYWEB/o9ugdUHkbpW6UO8bu8DpkFDC/TV3XB8fyy', 'buyer', '2025-03-27 13:33:45', 0),
-(18, 'trial', 'trial', 'trial@gmail.com', '$2y$10$OPm0UirwtMIsPX9tB0HQ.ugxG0TuCkKsrhC5IaUpSOq9e0bjPVH5y', 'buyer', '2025-03-27 13:41:27', 0),
-(19, '2trial', '1', '1@gmail.com', '$2y$10$nT4za6iDbbavpmQ.F.qMw.bK9UhOCj2.qzoTkQwdAhx449yN1/.cy', 'artist', '2025-03-27 13:44:28', 0);
+INSERT INTO `users` (`user_id`, `firstname`, `lastname`, `email`, `password_hash`, `role`, `created_at`, `archived`, `profile_image`) VALUES
+(1, 'artist1', 'artist1', 'artist1@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'artist', '2025-03-20 09:17:05', 0, NULL),
+(2, 'Michael', 'Angelo', 'artist@gmail.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'artist', '2025-03-20 09:17:05', 0, NULL),
+(3, 'buyer1', 'artist1', 'buyer1@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'buyer', '2025-03-20 09:17:05', 0, NULL),
+(4, 'buyer2', 'artist1', 'buyer2@example.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'buyer', '2025-03-20 09:17:05', 0, NULL),
+(5, 'Joestar', 'Jotaro', 'admin@gmail.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'admin', '2025-03-20 09:17:05', 0, NULL),
+(7, 'kwame', 'kwame', 'kwame@gmail.com', '$2y$10$/yslo.JecxuCcEEfcz5lqO3a4W2cBCZLWsONnGWnwac6sAsHKBd2G', 'buyer', '2025-03-23 13:58:45', 0, NULL),
+(9, 'kwame', 'kwame', 'kwame11@gmail.com', '$2y$10$UHhCIO00EjOLJQzfHVb0zu2HTx1xvzmOJBu3ltABCZTohrLVE564.', 'artist', '2025-03-23 14:03:42', 0, NULL),
+(11, 'kwame', 'kwamena', 'kwamena12@s.com', '$2y$10$C5ci44DEcUwPuzmE790sCuD8A0XcdD2jit9SS4K1Ur4DyBYjClthi', 'buyer', '2025-03-23 14:05:33', 0, NULL),
+(12, 'qwe', 'qwe', 'q@gmail.com', '$2y$10$F3BtdXA.dfesNLW.zfyRZePlU01ku.2vtwEprK9xQtD2EDpaNpYda', 'buyer', '2025-03-23 14:10:00', 0, NULL),
+(14, 'adwoa', 'mansa', 'amanas@gmail.com', '$2y$10$fPxYbDhxjege1z3rPfZov.AqVvnzx7WQUjO8SHk7NGSapjPRPT8he', 'buyer', '2025-03-23 14:16:21', 0, NULL),
+(15, 'artist', '12', 'artist12@gmail.com', '$2y$10$eXvFkyVIf9JVPdGK.CNDe.Y4Mz3RFtcM.BsvPASZapm21IG9nJKXe', 'buyer', '2025-03-23 14:24:08', 0, NULL),
+(17, 'w', 'w', 'admi@example.com', '$2y$10$BtgB7uKZnR9nOJYWEB/o9ugdUHkbpW6UO8bu8DpkFDC/TV3XB8fyy', 'buyer', '2025-03-27 13:33:45', 0, NULL),
+(18, 'Amen', 'Thompson', 'buyer@gmail.com', '$2y$10$OPm0UirwtMIsPX9tB0HQ.ugxG0TuCkKsrhC5IaUpSOq9e0bjPVH5y', 'buyer', '2025-03-27 13:41:27', 0, NULL),
+(19, '2trial', '1', '1@gmail.com', '$2y$10$nT4za6iDbbavpmQ.F.qMw.bK9UhOCj2.qzoTkQwdAhx449yN1/.cy', 'artist', '2025-03-27 13:44:28', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -429,6 +549,33 @@ CREATE TABLE `user_collections` (
 
 INSERT INTO `user_collections` (`collection_id`, `user_id`, `artwork_id`, `collection_name`, `is_public`, `is_purchased`, `purchase_date`, `purchase_order_id`, `notes`, `created_at`, `updated_at`, `archived`) VALUES
 (1, 3, 1, 'Favorites', 0, 1, NULL, 1, NULL, '2025-04-01 11:42:44', '2025-04-01 11:42:44', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_subscriptions`
+--
+
+CREATE TABLE `user_subscriptions` (
+  `subscription_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `plan_id` int(11) NOT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `status` enum('active','expired','cancelled') DEFAULT 'active',
+  `auto_renew` tinyint(1) DEFAULT 0,
+  `payment_reference` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_subscriptions`
+--
+
+INSERT INTO `user_subscriptions` (`subscription_id`, `user_id`, `plan_id`, `start_date`, `end_date`, `status`, `auto_renew`, `payment_reference`, `created_at`, `updated_at`) VALUES
+(2, 18, 1, '2025-04-04 13:18:13', '2025-05-04 13:18:13', 'active', 1, NULL, '2025-04-04 13:18:13', '2025-04-04 13:18:13'),
+(3, 18, 4, '2025-04-04 14:30:30', '2125-04-04 14:30:30', 'active', 0, NULL, '2025-04-04 14:30:30', '2025-04-04 14:30:30');
 
 -- --------------------------------------------------------
 
@@ -475,6 +622,15 @@ ALTER TABLE `adminactions`
 ALTER TABLE `artists`
   ADD PRIMARY KEY (`artist_id`),
   ADD UNIQUE KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `artist_subscription_settings`
+--
+ALTER TABLE `artist_subscription_settings`
+  ADD PRIMARY KEY (`setting_id`),
+  ADD UNIQUE KEY `artist_tier_unique` (`artist_id`,`tier_id`),
+  ADD KEY `artist_id` (`artist_id`),
+  ADD KEY `tier_id` (`tier_id`);
 
 --
 -- Indexes for table `artworks`
@@ -561,7 +717,9 @@ ALTER TABLE `orders`
   ADD PRIMARY KEY (`order_id`),
   ADD KEY `buyer_id` (`buyer_id`),
   ADD KEY `artwork_id` (`artwork_id`),
-  ADD KEY `orders_ibfk_3` (`auction_id`);
+  ADD KEY `orders_ibfk_3` (`auction_id`),
+  ADD KEY `orders_ibfk_4` (`applied_subscription_id`),
+  ADD KEY `fk_orders_subscription_plan` (`subscription_plan_id`);
 
 --
 -- Indexes for table `payments`
@@ -570,6 +728,13 @@ ALTER TABLE `payments`
   ADD PRIMARY KEY (`payment_id`),
   ADD UNIQUE KEY `transaction_id` (`transaction_id`),
   ADD KEY `order_id` (`order_id`);
+
+--
+-- Indexes for table `portfolio_items`
+--
+ALTER TABLE `portfolio_items`
+  ADD PRIMARY KEY (`item_id`),
+  ADD KEY `artist_id` (`artist_id`);
 
 --
 -- Indexes for table `reports`
@@ -586,6 +751,19 @@ ALTER TABLE `reviews`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  ADD PRIMARY KEY (`plan_id`),
+  ADD KEY `artist_id` (`artist_id`);
+
+--
+-- Indexes for table `subscription_tiers`
+--
+ALTER TABLE `subscription_tiers`
+  ADD PRIMARY KEY (`tier_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -600,6 +778,14 @@ ALTER TABLE `user_collections`
   ADD KEY `user_id` (`user_id`),
   ADD KEY `artwork_id` (`artwork_id`),
   ADD KEY `purchase_order_id` (`purchase_order_id`);
+
+--
+-- Indexes for table `user_subscriptions`
+--
+ALTER TABLE `user_subscriptions`
+  ADD PRIMARY KEY (`subscription_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `plan_id` (`plan_id`);
 
 --
 -- Indexes for table `wishlists`
@@ -624,6 +810,12 @@ ALTER TABLE `adminactions`
 --
 ALTER TABLE `artists`
   MODIFY `artist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `artist_subscription_settings`
+--
+ALTER TABLE `artist_subscription_settings`
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `artworks`
@@ -659,7 +851,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `collection_folders`
 --
 ALTER TABLE `collection_folders`
-  MODIFY `folder_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `folder_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `collection_folder_items`
@@ -689,13 +881,19 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
   MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `portfolio_items`
+--
+ALTER TABLE `portfolio_items`
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `reports`
@@ -710,6 +908,18 @@ ALTER TABLE `reviews`
   MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `subscription_tiers`
+--
+ALTER TABLE `subscription_tiers`
+  MODIFY `tier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -720,6 +930,12 @@ ALTER TABLE `users`
 --
 ALTER TABLE `user_collections`
   MODIFY `collection_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `user_subscriptions`
+--
+ALTER TABLE `user_subscriptions`
+  MODIFY `subscription_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `wishlists`
@@ -743,6 +959,13 @@ ALTER TABLE `adminactions`
 --
 ALTER TABLE `artists`
   ADD CONSTRAINT `artists_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `artist_subscription_settings`
+--
+ALTER TABLE `artist_subscription_settings`
+  ADD CONSTRAINT `artist_subscription_settings_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `artist_subscription_settings_ibfk_2` FOREIGN KEY (`tier_id`) REFERENCES `subscription_tiers` (`tier_id`);
 
 --
 -- Constraints for table `artworks`
@@ -806,15 +1029,23 @@ ALTER TABLE `notifications`
 -- Constraints for table `orders`
 --
 ALTER TABLE `orders`
+  ADD CONSTRAINT `fk_orders_subscription_plan` FOREIGN KEY (`subscription_plan_id`) REFERENCES `artist_subscription_settings` (`setting_id`),
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`artwork_id`) REFERENCES `artworks` (`artwork_id`),
-  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`auction_id`) REFERENCES `auctions` (`auction_id`);
+  ADD CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`auction_id`) REFERENCES `auctions` (`auction_id`),
+  ADD CONSTRAINT `orders_ibfk_4` FOREIGN KEY (`applied_subscription_id`) REFERENCES `user_subscriptions` (`subscription_id`);
 
 --
 -- Constraints for table `payments`
 --
 ALTER TABLE `payments`
   ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
+
+--
+-- Constraints for table `portfolio_items`
+--
+ALTER TABLE `portfolio_items`
+  ADD CONSTRAINT `portfolio_items_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`artist_id`);
 
 --
 -- Constraints for table `reviews`
@@ -824,12 +1055,25 @@ ALTER TABLE `reviews`
   ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
+-- Constraints for table `subscription_plans`
+--
+ALTER TABLE `subscription_plans`
+  ADD CONSTRAINT `subscription_plans_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `users` (`user_id`);
+
+--
 -- Constraints for table `user_collections`
 --
 ALTER TABLE `user_collections`
   ADD CONSTRAINT `user_collections_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `user_collections_ibfk_2` FOREIGN KEY (`artwork_id`) REFERENCES `artworks` (`artwork_id`),
   ADD CONSTRAINT `user_collections_ibfk_3` FOREIGN KEY (`purchase_order_id`) REFERENCES `orders` (`order_id`);
+
+--
+-- Constraints for table `user_subscriptions`
+--
+ALTER TABLE `user_subscriptions`
+  ADD CONSTRAINT `user_subscriptions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `user_subscriptions_ibfk_2` FOREIGN KEY (`plan_id`) REFERENCES `artist_subscription_settings` (`setting_id`);
 
 --
 -- Constraints for table `wishlists`

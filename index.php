@@ -41,15 +41,15 @@ if (isset($_SESSION['user_id'])) {
             <div class="category-card bg-gray-800 p-6 rounded-lg text-center">
                 <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
                    <!-- replace with icons  -->
-                <i class="fas fa-paint-brush text-3xl text-b8895c"></i>
+                <img src="images/abstract.jpg" alt="Abstract Art" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold">Abstract</h3>
-                <p class="text-gray-400 mt-2">120+ artworks</p>
+                <p class="text-gray-400 mt-2">20+ artworks</p>
             </div>
             
             <div class="category-card bg-gray-800 p-6 rounded-lg text-center">
                 <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
-                    <i class="fas fa-portrait text-3xl text-b8895c"></i>
+                <img src="images/portrait.jpg" alt="Abstract Art" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold">Portraits</h3>
                 <p class="text-gray-400 mt-2">85+ artworks</p>
@@ -57,15 +57,15 @@ if (isset($_SESSION['user_id'])) {
             
             <div class="category-card bg-gray-800 p-6 rounded-lg text-center">
                 <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
-                    <i class="fas fa-mountain text-3xl text-b8895c"></i>
+                <img src="images/landscape.jpg" alt="Abstract Art" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold">Landscapes</h3>
-                <p class="text-gray-400 mt-2">150+ artworks</p>
+                <p class="text-gray-400 mt-2">50+ artworks</p>
             </div>
             
             <div class="category-card bg-gray-800 p-6 rounded-lg text-center">
                 <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
-                    <i class="fas fa-cubes text-3xl text-b8895c"></i>
+                <img src="images/modern.jpg" alt="Abstract Art" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold">Modern Art</h3>
                 <p class="text-gray-400 mt-2">95+ artworks</p>
@@ -87,36 +87,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <script>
-    // Load featured artworks on page load
-    document.addEventListener('DOMContentLoaded', loadFeaturedArtworks);
-
-    function loadFeaturedArtworks() {
-        fetch('api/get_featured_artworks.php')
-        .then(response => response.json())
-        .then(artworks => {
-            const grid = document.getElementById('artworks-grid');
-            grid.innerHTML = ''; // Clear existing content
-            
-            artworks.forEach(artwork => {
-                const card = `
-                    <div class="artwork-card rounded-lg overflow-hidden">
-                        <img src="images/${artwork.image_url}" alt="${artwork.title}" class="w-full h-64 object-cover">
-                        <div class="artwork-overlay">
-                            <h3 class="text-xl font-bold">"${artwork.title}"</h3>
-                            <p class="text-gray-300">by ${artwork.artist_name}</p>
-                            <p class="text-b8895c font-bold mt-2">$${artwork.price}</p>
-                            <a href="artwork-details.php?id=${artwork.artwork_id}" class="btn btn-primary mt-4 inline-block">View Details</a>
-                        </div>
-                    </div>
-                `;
-                grid.innerHTML += card;
-            });
-        })
-        .catch(error => console.error('Error loading featured artworks:', error));
-    }
-    </script>
-
     <!-- Why Choose Us -->
     <section class="section-container bg-gray-800 rounded-lg">
         <h2 class="section-heading">Why Choose Us</h2>
@@ -125,7 +95,7 @@ if (isset($_SESSION['user_id'])) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <div class="text-center p-6">
                 <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-b8895c flex items-center justify-center">
-                    <i class="fas fa-lock text-2xl text-white"></i>
+                <img src="images/payment.jpg" alt="Secure Payments" class="w-50 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold mb-2">Secure Payments</h3>
                 <p class="text-gray-400">Encrypted transactions with buyer protection</p>
@@ -133,7 +103,7 @@ if (isset($_SESSION['user_id'])) {
             
             <div class="text-center p-6">
                 <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-b8895c flex items-center justify-center">
-                    <i class="fas fa-user-check text-2xl text-white"></i>
+                <img src="images/verified icon.png" alt="Verified Artist" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold mb-2">Verified Artists</h3>
                 <p class="text-gray-400">All artists undergo strict verification</p>
@@ -141,7 +111,7 @@ if (isset($_SESSION['user_id'])) {
             
             <div class="text-center p-6">
                 <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-b8895c flex items-center justify-center">
-                    <i class="fas fa-copyright text-2xl text-white"></i>
+                <img src="images/copyright.png" alt="Abstract Art" class="w-16 h-16 rounded-full object-cover">
                 </div>
                 <h3 class="text-xl font-semibold mb-2">Copyright Protection</h3>
                 <p class="text-gray-400">Watermarking and digital rights management</p>
@@ -196,6 +166,53 @@ if (isset($_SESSION['user_id'])) {
     <?php require_once 'includes/footer.php'; ?>
 
     <script>
+    // Load featured artworks on page load
+    document.addEventListener('DOMContentLoaded', loadFeaturedArtworks);
+
+    function loadFeaturedArtworks() {
+        fetch('api/get_featured_artworks.php')
+        .then(response => response.json())
+        .then(artworks => {
+            const grid = document.getElementById('artworks-grid');
+            grid.innerHTML = ''; // Clear existing content
+            
+            artworks.forEach(artwork => {
+                const card = `
+                    <div class="artwork-card rounded-lg overflow-hidden">
+                        <img src="images/${artwork.image_url}" alt="${artwork.title}" class="w-full h-64 object-cover">
+                        <div class="artwork-overlay">
+                            <h3 class="text-xl font-bold">"${artwork.title}"</h3>
+                            <p class="text-gray-300">by ${artwork.artist_name}</p>
+                            <p class="text-b8895c font-bold mt-2">$${artwork.price}</p>
+                            <a href="artwork-details.php?id=${artwork.artwork_id}" class="btn btn-primary mt-4 inline-block">View Details</a>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        })
+        .catch(error => console.error('Error loading featured artworks:', error));
+    }
+
+
+    if (localStorage.getItem('theme') === 'dark' || 
+      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark-mode');
+    document.getElementById('light-icon').classList.add('hidden');
+    document.getElementById('dark-icon').classList.remove('hidden');
+  }
+
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    html.classList.toggle('dark-mode');
+    
+    const isDark = html.classList.contains('dark-mode');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    
+    document.getElementById('light-icon').classList.toggle('hidden');
+    document.getElementById('dark-icon').classList.toggle('hidden');
+  }
+    
         // Search Bar Functionality
         document.getElementById('search-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -205,11 +222,7 @@ if (isset($_SESSION['user_id'])) {
             }
         });
 
-        // Toggle mobile menu
-        function toggleMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
+        
     </script>
 </body>
 </html>

@@ -145,5 +145,49 @@
         .artwork-card:hover .artwork-overlay {
             bottom: 0;
         }
+                /* Add these styles */
+        .dark-mode {
+        background-color: #111827;
+        color: #f3f4f6;
+        }
+
+        .dark-mode .bg-white {
+        background-color: #1f2937 !important;
+        }
+
+        .dark-mode .bg-gray-50 {
+        background-color: #111827 !important;
+        }
+
+        .dark-mode .bg-gray-100 {
+        background-color: #1f2937 !important;
+        }
+
+        .dark-mode .text-gray-800,
+        .dark-mode .text-gray-700,
+        .dark-mode .text-gray-600,
+        .dark-mode .text-gray-900 {
+        color: #e5e7eb !important;
+        }
+
+        .dark-mode .border-gray-300 {
+        border-color: #374151 !important;
+        }
+
+        .dark-mode .bg-gray-50 {
+        background-color: #1f2937 !important;
+        }
+
+        .dark-mode input,
+        .dark-mode textarea,
+        .dark-mode select {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+        color: #f3f4f6 !important;
+        }
+
+        .dark-mode .shadow-sm {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+        }
     </style>
 </head>

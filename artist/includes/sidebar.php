@@ -74,6 +74,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link <?php echo ($currentPage == 'subscription.php.') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/artist/dashboard/subscription.php">
+                    <i class="fas fa-crown me-2"></i>
+                    Subscriptions
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link <?php echo ($currentPage == 'messages.php') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/artist/dashboard/messages.php">
                     <i class="fas fa-envelope me-2"></i>
                     Messages
