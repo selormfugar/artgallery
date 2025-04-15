@@ -177,7 +177,11 @@ if (isset($_SESSION['user_id'])) {
             border-color: #3b82f6;
             }
         </style>
-    
+     <!-- Theme toggle floating button -->
+     <button id="theme-toggle" class="theme-toggle fixed bottom-6 right-6 z-50 shadow-lg">
+            <i class="fas fa-moon text-white" id="theme-icon"></i>
+        </button>
+
         
         <!-- Load More Button -->
         <div class="text-center mt-8">
@@ -186,6 +190,67 @@ if (isset($_SESSION['user_id'])) {
             </button>
         </div>
     </section>
+    <script>
+        // Function to calculate time remaining string
+        function getTimeRemainingString(endTime) {
+            const now = new Date().getTime();
+            const timeLeft = endTime - now;
+
+            if (timeLeft <= 0) {
+                return 'Auction Ended';
+            }
+
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            return `Time Left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Function to update all timers
+        function updateAllTimers() {
+            $('.auction-timer').each(function() {
+                const endTime = new Date($(this).data('end-time')).getTime();
+                $(this).html(getTimeRemainingString(endTime));
+            });
+        }
+
+        // Modify the displayArtworks function to include timer
+        function displayArtworks(artworks) {
+            artworks.forEach(artwork => {
+                const imagePath = '<?php echo SITE_URL; ?>/images/' + artwork.image_url;
+                
+                const artworkHtml = `
+                    <div class="gallery-item">
+                        <img src="${imagePath}" alt="${artwork.title.replace(/"/g, '&quot;')}" onerror="this.src='<?php echo SITE_URL; ?>/images/art10.jpg'">
+                        <div class="overlay">
+                            <h3 class="text-xl font-bold mb-2">${artwork.title.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
+                            <p class="mb-2">${artwork.description ? artwork.description.substring(0, 100).replace(/</g, '&lt;').replace(/>/g, '&gt;') + (artwork.description.length > 100 ? '...' : '') : 'No description available'}</p>
+                            <p class="text-sm mb-2">By: ${artwork.artist_name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                            ${artwork.end_time ? `<p class="auction-timer text-sm mb-4 text-yellow-400" data-end-time="${artwork.end_time}"></p>` : ''}
+                            <div class="flex space-x-2">
+                                <a href="artwork_detail.php?id=${artwork.artwork_id}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">View Details</a>
+                                ${artwork.is_for_auction ? 
+                                    `<a href="auction_detail.php?id=${artwork.auction_id}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition">View Auction</a>` : 
+                                    ''
+                                }
+                            </div>
+                        </div>
+                        <div class="artwork-info">
+                            <p class="font-bold mt-2">$${parseFloat(artwork.price).toFixed(2)}</p>
+                            ${artwork.end_time ? `<p class="auction-timer text-sm text-[#b8895c]" data-end-time="${artwork.end_time}"></p>` : ''}
+                        </div>
+                    </div>
+                `;
+                $('#gallery-grid').append(artworkHtml);
+            });
+            updateAllTimers(); // Update timers immediately after adding new artworks
+        }
+
+        // Update timers every second
+        setInterval(updateAllTimers, 1000);
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- After jQuery but before your other scripts -->
@@ -252,7 +317,7 @@ $(document).ready(function() {
         };
         
         $.ajax({
-            url: 'api/get_artworks.php',
+            url: 'api/get_auctions.php',
             type: 'GET',
             data: requestData,
             dataType: 'json',
@@ -306,8 +371,8 @@ $(document).ready(function() {
                         <div class="flex space-x-2">
                             <a href="artwork_detail.php?id=${artwork.artwork_id}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">View Details</a>
                             ${artwork.is_for_auction ? 
-                                `<a href="auction.php?id=${artwork.auction_id}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition">View Auction</a>` : 
-                                `<button onclick="addToCart(${artwork.artwork_id})" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Add to Cart</button>`
+                                `<a href="auction_detail.php?id=${artwork.auction_id}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition">View Auction</a>` : 
+                                ''
                             }
                         </div>
                     </div>

@@ -123,7 +123,7 @@ include_once '../includes/sidebar.php';
                 <?php if (count($recentlyViewed) > 0): ?>
                     <div class="row">
                         <?php foreach ($recentlyViewed as $artwork): ?>
-                            <div class="col-6 col-sm-4 col-md-3 col-xl-2 mb-4">
+                            <div class="col-6 col-sm-4 col-md-3 col-xl-4 mb-4">
                                 <div class="card h-100 artwork-card">
                                     <a href="#" data-artwork-id="<?php echo $artwork['artwork_id']; ?>" class="artwork-link">
                                         <div class="artwork-image-container">
@@ -140,7 +140,7 @@ include_once '../includes/sidebar.php';
                                     </div>
                                     <div class="card-footer bg-transparent border-top-0 p-2">
                                         <div class="d-flex justify-content-between">
-                                            <a href="#" class="btn btn-sm btn-outline-primary view-artwork" 
+                                            <a href="artwork_details.php" class="btn btn-sm btn-outline-primary view-artwork" 
                                                data-id="<?php echo $artwork['artwork_id']; ?>"
                                                title="View details">
                                                 <i class="fas fa-eye"></i>
@@ -498,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Redirect to artwork details page
-            window.location.href = `<?php echo SITE_URL; ?>/artwork.php?id=${artworkId}`;
+            window.location.href = `<?php echo SITE_URL; ?>/artwork_detail.php?id=${artworkId}`;
         });
     });
 });

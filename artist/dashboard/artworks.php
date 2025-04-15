@@ -60,6 +60,10 @@ include_once '../includes/sidebar.php';
             </a>
         </div>
     </div>
+ <!-- Theme toggle floating button -->
+ <button id="theme-toggle" class="theme-toggle fixed bottom-6 right-6 z-50 shadow-lg">
+            <i class="fas fa-moon text-white" id="theme-icon"></i>
+        </button>
 
     <!-- Filter and Search -->
     <div class="row mb-4">

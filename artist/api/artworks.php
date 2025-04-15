@@ -138,21 +138,21 @@ try {
         ];
 
         // Handle image upload
-        if (!empty($_FILES['image']['name'])) {
-            $upload = uploadImage($_FILES['image']);
-            if (!$upload['success']) {
-                throw new Exception($upload['message']);
-            }
-            $artworkData['image_url'] = $upload['path'];
-            
-            // Delete old image if exists
-            if ($artworkId && !empty($_POST['current_image'])) {
-                $oldImagePath = UPLOAD_DIR . basename($_POST['current_image']);
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
+            if (!empty($_FILES['image']['name'])) {
+                $upload = uploadImage($_FILES['image']);
+                if (!$upload['success']) {
+                    throw new Exception($upload['message']);
+                }
+                $artworkData['image_url'] = $upload['path'];
+                
+                // Delete old image if exists
+                if ($artworkId && !empty($_POST['current_image'])) {
+                    $oldImagePath = UPLOAD_DIR . basename($_POST['current_image']);
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath);
+                    }
                 }
             }
-        }
 
         // Start transaction
         $db->getConnection()->beginTransaction();

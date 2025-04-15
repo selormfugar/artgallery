@@ -7,19 +7,19 @@ function isLoggedIn() {
 }
 
 function isAdmin() {
-    return isset($_SESSION['admin_role']) && in_array($_SESSION['admin_role'], [ROLE_SUPER_ADMIN, ROLE_ADMIN]);
+    return isset($_SESSION['role']) && in_array($_SESSION['role'], [ROLE_SUPER_ADMIN, ROLE_ADMIN]);
 }
 
 function isSuperAdmin() {
-    return isset($_SESSION['admin_role']) && $_SESSION['admin_role'] == ROLE_SUPER_ADMIN;
+    return isset($_SESSION['role']) && $_SESSION['role'] == ROLE_SUPER_ADMIN;
 }
 
-// function requireLogin() {
-//     if (!isLoggedIn()) {
-//         header('Location: ' . SITE_URL . '/login.php');
-//         exit;
-//     }
-// }
+function requireLogin() {
+    if (!isLoggedIn()) {
+        header('Location: ' . SITE_URL . '/login.php');
+        exit;
+    }
+}
 
 function requirePermission($permission) {
     requireLogin();
@@ -36,7 +36,19 @@ function hasPermission($permission) {
     }
     
     global $role_permissions;
-    $role = $_SESSION['admin_role'];
+    if (!isset($role_permissions)) {
+        $role_permissions = [
+            'super_admin' => [ 'admin', 'super_admin'],
+            'admin' => [ 'admin'],
+            'seller' => ['artist'],
+            'buyer' => ['buyer']
+        ];
+    }
+    
+    $role = $_SESSION['role'];
+    if (!isset($role) || !isset($role_permissions[$role])) {
+        return false;
+    }
     
     return in_array($permission, $role_permissions[$role]);
 }
@@ -49,7 +61,7 @@ function hasPermission($permission) {
 //     if ($admin && password_verify($password, $admin['password_hash'])) {
 //         $_SESSION['admin_id'] = $admin['user_id'];
 //         $_SESSION['admin_name'] = $admin['email'];
-//         $_SESSION['admin_role'] = $admin['role'];
+//         $_SESSION['role'] = $admin['role'];
         
 //         // Log login
 //         logAdminActivity('login', 'Admin logged in');
@@ -59,6 +71,73 @@ function hasPermission($permission) {
     
 //     return false;
 // }
+
+function getBuyerStats($userId) {
+    global $db;
+    
+    $stats = [
+        'total_purchases' => 0,
+        'total_spent' => 0,
+        'wishlist_count' => 0,
+        'pending_orders' => 0,
+        'unread_messages' => 0
+    ];
+    
+    // Get total purchases and amount spent
+    $result = $db->selectOne("SELECT COUNT(*) as total_purchases, COALESCE(SUM(total_price), 0) as total_spent 
+                             FROM orders 
+                             WHERE buyer_id = ? AND payment_status = 'completed'",
+                             [$userId]);
+    if ($result) {
+        $stats['total_purchases'] = $result['total_purchases'];
+        $stats['total_spent'] = $result['total_spent'];
+    }
+
+    // Get wishlist count
+    $result = $db->selectOne("SELECT COUNT(*) as wishlist_count FROM wishlists WHERE user_id = ?",
+                            [$userId]);
+    if ($result) {
+        $stats['wishlist_count'] = $result['wishlist_count'];
+    }
+
+    // Get pending orders count
+    $result = $db->selectOne("SELECT COUNT(*) as pending_orders FROM orders 
+                             WHERE buyer_id = ? AND payment_status = 'pending'",
+                             [$userId]);
+    if ($result) {
+        $stats['pending_orders'] = $result['pending_orders'];
+    }
+
+    return $stats;
+}
+
+// Get recent purchases
+function getRecentPurchases($userId) {
+    global $db;
+    
+    return $db->select("SELECT o.*, a.title, a.image_url, u.email as artist_name 
+                        FROM orders o
+                        JOIN artworks a ON o.artwork_id = a.artwork_id
+                        JOIN users u ON a.artist_id = u.user_id
+                        WHERE o.buyer_id = ?
+                        ORDER BY o.created_at DESC 
+                        LIMIT 5",
+                        [$userId]);
+}
+
+// Get recently viewed artworks
+function getRecentlyViewedArtworks($userId) {
+    global $db;
+    
+    return $db->select("SELECT a.*, u.email as artist_name, v.viewed_at
+                        FROM artwork_views v
+                        JOIN artworks a ON v.artwork_id = a.artwork_id
+                        JOIN users u ON a.artist_id = u.user_id
+                        WHERE v.user_id = ?
+                        ORDER BY v.viewed_at DESC
+                        LIMIT 6",
+                        [$userId]);
+}
 
 function logout() {
     // Log logout
@@ -71,13 +150,13 @@ function logout() {
 }
 
 // Admin dashboard functions
-function getDashboardStats() {
+function getDashboardStat() {
     global $db;
     
     $stats = [];
     
     // Total users
-    $users = $db->selectOne("SELECT COUNT(*) as count FROM users WHERE archived = 0");
+    $users = $db->selectOne("SELECT COUNT(*) as count FROM users WHERE archived = 0 " );
     $stats['total_users'] = $users['count'];
     
     // New users in last 30 days
@@ -129,6 +208,101 @@ function getRecentUsers($limit = 5) {
     );
 }
 
+function getCompletedTransactions() {
+    global $db;
+   return $db->select("SELECT o.order_id as transaction_id, o.created_at as transaction_date,
+              u.firstname as first_name, u.lastname as last_name, 
+              a.title as artwork_title, o.total_price as total_amount
+              FROM orders o
+              JOIN users u ON o.buyer_id = u.user_id
+              JOIN artworks a ON o.artwork_id = a.artwork_id
+              WHERE o.payment_status = 'completed' AND o.archived = 0
+              ORDER BY o.created_at DESC  LIMIT 5"
+              );
+
+ 
+}
+function getUserById($userId) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function archiveUser($userId) {
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE users SET is_archived = 1, archived_at = NOW() WHERE user_id = ?");
+    return $stmt->execute([$userId]);
+}
+
+function getUsersWithPagination($offset, $perPage, $search = null, $role = null) {
+    global $db;
+    
+    $sql = "SELECT * FROM users WHERE 1=1";
+    $params = [];
+    
+    if ($search) {
+        $sql .= " AND (email LIKE ? OR name LIKE ?)";
+        $searchTerm = "%$search%";
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+    }
+    
+    if ($role) {
+        $sql .= " AND role = ?";
+        $params[] = $role;
+    }
+    
+    $sql .= " ORDER BY created_at ASC LIMIT " . (int)$offset . ", " . (int)$perPage;
+    
+    return $db->select($sql, $params);
+}
+
+// JSON response helper
+function jsonResponse($success, $data = null, $error = null) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => $success,
+        'data' => $data,
+        'error' => $error
+    ]);
+    exit;
+}
+function getTotalUsersCount($search = null, $role = null) {
+    global $db;
+    
+    $sql = "SELECT COUNT(*) as total FROM users WHERE 1=1";
+    $params = [];
+    
+    if ($search) {
+        $sql .= " AND (email LIKE ? OR name LIKE ?)";
+        $searchTerm = "%$search%";
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+    }
+    
+    if ($role) {
+        $sql .= " AND role = ?";
+        $params[] = $role;
+    }
+    
+    $result = $db->selectOne($sql, $params);
+    return $result['total'];
+}
+
+// function getRecentArtworks($limit = 5) {
+//     global $db;
+    
+//     return $db->select("
+//         SELECT a.*, u.email as artist_name
+//         FROM artworks a
+//         JOIN artists ar ON a.artist_id = ar.artist_id
+//         JOIN users u ON ar.user_id = u.user_id
+//         WHERE a.archived = 0
+//         ORDER BY a.created_at DESC 
+//         LIMIT $limit"
+//     );
+// }
 function getRecentSales($limit = 5) {
     global $db;
     
@@ -164,14 +338,14 @@ function getPendingModeration($limit = 5) {
 
 
 function getAllUsers() {
-    global $db; // Assuming $db is your database connection
+    global $db; // Assuming $db is your database dbection
     $query = "SELECT user_id, email, role, created_at FROM users";
     $result = $db->query($query);
     return $result->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function checkAdminPrivileges() {
-    if (!isset($_SESSION['admin_role']) || !in_array($_SESSION['admin_role'], [ROLE_SUPER_ADMIN, ROLE_ADMIN])) {
+    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], [ROLE_SUPER_ADMIN, ROLE_ADMIN])) {
         header('Location: ' . SITE_URL . '/access-denied.php');
         exit;
     }
@@ -185,8 +359,7 @@ function fetchReportedContent($limit = 20, $offset = 0) {
         LEFT JOIN users u ON f.reporter_id = u.user_id
         WHERE f.archived = 0
         ORDER BY f.created_at DESC
-        LIMIT ? OFFSET ?", 
-        [$limit, $offset]
+        LIMIT " . intval($limit) . " OFFSET " . intval($offset)
     );
 }
 
@@ -447,53 +620,53 @@ function getArtworks($limit = 20, $offset = 0, $filters = []) {
     return $db->select($sql, $params);
 }
 
-function getArtworkDetails($artworkId) {
-    global $db;
+// function getArtworkDetails($artworkId) {
+//     global $db;
     
-    $artwork = $db->selectOne("
-        SELECT a.*, u.email as artist_name, u.email as artist_email,
-               ar.bio as artist_bio, ar.website as artist_website
-        FROM artworks a
-        JOIN artists ar ON a.artist_id = ar.artist_id
-        JOIN users u ON ar.user_id = u.user_id
-        WHERE a.artwork_id = ? AND a.archived = 0", 
-        [$artworkId]
-    );
+//     $artwork = $db->selectOne("
+//         SELECT a.*, u.email as artist_name, u.email as artist_email,
+//                ar.bio as artist_bio, ar.website as artist_website
+//         FROM artworks a
+//         JOIN artists ar ON a.artist_id = ar.artist_id
+//         JOIN users u ON ar.user_id = u.user_id
+//         WHERE a.artwork_id = ? AND a.archived = 0", 
+//         [$artworkId]
+//     );
     
-    if (!$artwork) {
-        return null;
-    }
+//     if (!$artwork) {
+//         return null;
+//     }
     
-    // Get moderation history
-    $artwork['moderation_history'] = $db->select("
-        SELECT * FROM moderation_logs
-        WHERE artwork_id = ?
-        ORDER BY created_at DESC", 
-        [$artworkId]
-    );
+//     // Get moderation history
+//     $artwork['moderation_history'] = $db->select("
+//         SELECT * FROM moderation_logs
+//         WHERE artwork_id = ?
+//         ORDER BY created_at DESC", 
+//         [$artworkId]
+//     );
     
-    // Get sales history
-    $artwork['sales'] = $db->select("
-        SELECT o.*, u.email as buyer_name
-        FROM orders o
-        JOIN users u ON o.buyer_id = u.user_id
-        WHERE o.artwork_id = ? AND o.archived = 0
-        ORDER BY o.created_at DESC", 
-        [$artworkId]
-    );
+//     // Get sales history
+//     $artwork['sales'] = $db->select("
+//         SELECT o.*, u.email as buyer_name
+//         FROM orders o
+//         JOIN users u ON o.buyer_id = u.user_id
+//         WHERE o.artwork_id = ? AND o.archived = 0
+//         ORDER BY o.created_at DESC", 
+//         [$artworkId]
+//     );
     
-    // Get content flags
-    $artwork['flags'] = $db->select("
-        SELECT f.*, u.email as reporter_name
-        FROM content_flags f
-        LEFT JOIN users u ON f.reporter_id = u.user_id
-        WHERE f.content_type = 'artwork' AND f.content_id = ? AND f.archived = 0
-        ORDER BY f.created_at DESC", 
-        [$artworkId]
-    );
+//     // Get content flags
+//     $artwork['flags'] = $db->select("
+//         SELECT f.*, u.email as reporter_name
+//         FROM content_flags f
+//         LEFT JOIN users u ON f.reporter_id = u.user_id
+//         WHERE f.content_type = 'artwork' AND f.content_id = ? AND f.archived = 0
+//         ORDER BY f.created_at DESC", 
+//         [$artworkId]
+//     );
     
-    return $artwork;
-}
+//     return $artwork;
+// }
 
 function moderateArtwork($artworkId, $status, $notes = '') {
     global $db;
@@ -1145,7 +1318,7 @@ function getAdminUsers() {
     return $db->select("
         SELECT a.*, r.name as role_name
         FROM admin_users a
-        JOIN admin_roles r ON a.role_id = r.role_id
+        JOIN roles r ON a.role_id = r.role_id
         WHERE a.archived = 0
         ORDER BY a.name ASC
     ");
@@ -1157,7 +1330,7 @@ function getAdminUser($adminId) {
     return $db->selectOne("
         SELECT a.*, r.name as role_name
         FROM admin_users a
-        JOIN admin_roles r ON a.role_id = r.role_id
+        JOIN roles r ON a.role_id = r.role_id
         WHERE a.admin_id = ? AND a.archived = 0", 
         [$adminId]
     );
@@ -1236,7 +1409,7 @@ function deleteAdminUser($adminId) {
 function getAdminRoles() {
     global $db;
     
-    return $db->select("SELECT * FROM admin_roles ORDER BY role_id ASC");
+    return $db->select("SELECT * FROM roles ORDER BY role_id ASC");
 }
 
 function logAdminActivity($action, $description) {

@@ -156,7 +156,11 @@ if ($userId) {
                 <p class="text-gray-600 dark:text-gray-400 text-center">
                     Expand your collection with these trending creators.
                 </p>
-            </div>
+            </div><!-- Theme toggle floating button -->
+     <button id="theme-toggle" class="theme-toggle fixed bottom-6 right-6 z-50 shadow-lg">
+            <i class="fas fa-moon text-white" id="theme-icon"></i>
+        </button>
+
 
             <!-- Recommended Artists Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -398,23 +402,37 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-    if (localStorage.getItem('theme') === 'dark' || 
-            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark-mode');
-            document.getElementById('light-icon').classList.add('hidden');
-            document.getElementById('dark-icon').classList.remove('hidden');
-        }
-
-  function toggleDarkMode() {
+     // Dark/Light mode toggle functionality
+     const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
     const html = document.documentElement;
-    html.classList.toggle('dark-mode');
     
-    const isDark = html.classList.contains('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    // Check for saved user preference or use system preference
+    const savedTheme = localStorage.getItem('theme') || 
+                      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     
-    document.getElementById('light-icon').classList.toggle('hidden');
-    document.getElementById('dark-icon').classList.toggle('hidden');
-  }
+    // Apply the saved theme
+    if (savedTheme === 'dark') {
+        html.classList.add('dark');
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+    } else {
+        html.classList.remove('dark');
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
+    }
+    
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+    
     </script>
 </body>
 </html>

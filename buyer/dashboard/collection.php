@@ -168,10 +168,10 @@ include_once '../includes/sidebar.php';
                             </div>
                             <div class="card-footer bg-white border-top-0">
                                 <div class="d-flex justify-content-between">
-                                    <a href="<?php echo SITE_URL; ?>/dashboard/artwork-details.php?id=<?php echo $item['artwork_id']; ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?php echo SITE_URL; ?>/buyer/dashboard/artwork_detail.php?id=<?php echo $item['artwork_id']; ?>" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-eye me-1"></i> View
                                     </a>
-                                    <a href="<?php echo SITE_URL; ?>/dashboard/certificate.php?order_id=<?php echo $item['order_id']; ?>" class="btn btn-sm btn-outline-secondary">
+                                    <a href="<?php echo SITE_URL; ?>/buyer/dashboard/certificate.php?order_id=<?php echo $item['order_id']; ?>" class="btn btn-sm btn-outline-secondary">
                                         <i class="fas fa-certificate me-1"></i> Certificate
                                     </a>
                                 </div>

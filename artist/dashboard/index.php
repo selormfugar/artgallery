@@ -110,7 +110,7 @@ include_once '../includes/sidebar.php';
 
     <!-- Sales Chart -->
     <div class="row">
-        <div class="col-xl-8 col-lg-7">
+        <!-- <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Sales Overview</h6>
@@ -134,49 +134,15 @@ include_once '../includes/sidebar.php';
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Recent Sales -->
-        <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Sales</h6>
-                </div>
-                <div class="card-body">
-                    <?php if (count($recentSales) > 0): ?>
-                        <div class="list-group">
-                            <?php foreach ($recentSales as $sale): ?>
-                                <div class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1"><?php echo $sale['title']; ?></h6>
-                                        <small><?php echo formatDate($sale['created_at']); ?></small>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <p class="mb-1">Buyer: <?php echo $sale['buyer_name']; ?></p>
-                                        <span class="badge bg-success"><?php echo formatCurrency($sale['total_price']); ?></span>
-                                    </div>
-                                    <small class="text-muted">Status: <?php echo ucfirst($sale['payment_status']); ?></small>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php else: ?>
-                        <p class="text-center">No recent sales found.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upcoming Tasks/Reminders -->
-    <div class="row">
-        <div class="col-12">
+        </div> -->
+        <div class="col-xl-9 col-lg-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">Upcoming Tasks & Reminders</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
+                        <table class="table table-bordered" width="10%" cellspacing="0">
                             <thead>
                                 <tr>
                                     <th>Task</th>
@@ -226,6 +192,40 @@ include_once '../includes/sidebar.php';
                 </div>
             </div>
         </div>
+        <!-- Recent Sales -->
+        <div class="col-xl-3 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Sales</h6>
+                </div>
+                <div class="card-body">
+                    <?php if (count($recentSales) > 0): ?>
+                        <div class="list-group">
+                            <?php foreach ($recentSales as $sale): ?>
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1"><?php echo $sale['title']; ?></h6>
+                                        <small><?php echo formatDate($sale['created_at']); ?></small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <p class="mb-1">Buyer: <?php echo $sale['buyer_name']; ?></p>
+                                        <span class="badge bg-success"><?php echo formatCurrency($sale['total_price']); ?></span>
+                                    </div>
+                                    <!-- <small class="text-muted">Status: <?php echo ucfirst($sale['payment_status']); ?></small> -->
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-center">No recent sales found.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Tasks/Reminders -->
+    <div class="row">
+      
     </div>
 </div>
 

@@ -1,11 +1,11 @@
 <?php
 // Get unread message count
 $unreadMessages = 0;
-if (isLoggedIn()) {
-    global $db;
-    $result = $db->selectOne("SELECT COUNT(*) as count FROM messages WHERE receiver_id = ? AND seen = 0 AND archived = 0", [$_SESSION['user_id']]);
-    $unreadMessages = $result['count'];
-}
+// if (isLoggedIn()) {
+//     global $db;
+//     $result = $db->selectOne("SELECT COUNT(*) as count FROM messages WHERE receiver_id = ? AND seen = 0 AND archived = 0", [$_SESSION['user_id']]);
+//     $unreadMessages = $result['count'];
+// }
 
 // Get current page
 $currentPage = basename($_SERVER['PHP_SELF']);
@@ -74,7 +74,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link <?php echo ($currentPage == 'subscription.php.') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/artist/dashboard/subscription.php">
+                <a class="nav-link <?php echo ($currentPage == 'subscriptions.php.') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/artist/dashboard/subscription.php">
                     <i class="fas fa-crown me-2"></i>
                     Subscriptions
                 </a>
@@ -93,7 +93,18 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-cog me-2"></i>
                     Account Settings
                 </a>
+            <!-- </li>  <li class="nav-item">
+                <a class="nav-link <?php echo ($currentPage == 'stats.php') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/artist/dashboard/stats.php">
+                    <i class="fas fa-cog me-2"></i>
+                    Account stats
+                </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link <?php echo ($currentPage == 'portfolio.php') ? 'active' : ''; ?>" href="<?php echo SITE_URL; ?>/artist/dashboard/portfolio.php">
+                    <i class="fas fa-cog me-2"></i>
+                    Portfolio
+                </a>
+            </li> -->
         </ul>
         
         <hr class="text-light">

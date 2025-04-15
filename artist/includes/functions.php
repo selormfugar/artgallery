@@ -17,6 +17,51 @@ function requireLogin() {
     }
 }
 
+function uploadPortfolioImage($file, $artistId) {
+    $result = ['success' => false, 'error' => '', 'path' => ''];
+    
+    // Validate file
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (!in_array($file['type'], $allowedTypes)) {
+        $result['error'] = 'Invalid file type. Only JPG, PNG, and GIF are allowed.';
+        return $result;
+    }
+    
+    if ($file['size'] > $maxSize) {
+        $result['error'] = 'File size exceeds maximum limit of 5MB.';
+        return $result;
+    }
+    
+    // Create upload directory if it doesn't exist
+    $uploadDir = '../../uploads/portfolio/' . $artistId . '/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+    
+    // Generate unique filename
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $filename = uniqid('portfolio_') . '.' . $extension;
+    $destination = $uploadDir . $filename;
+    
+    if (move_uploaded_file($file['tmp_name'], $destination)) {
+        $result['success'] = true;
+        $result['path'] = str_replace('../../', '/', $destination); // Convert to web path
+    } else {
+        $result['error'] = 'Failed to move uploaded file.';
+    }
+    
+    return $result;
+}
+
+function getSubscriberCount($pdo, $planId) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_subscriptions 
+                          WHERE plan_id = ? AND status = 'active'");
+    $stmt->execute([$planId]);
+    return $stmt->fetchColumn();
+}
+
 function requireArtist() {
     requireLogin();
     if (!isArtist()) {
@@ -102,7 +147,7 @@ function getRecentSales($artistId, $limit = 5) {
         JOIN artworks a ON o.artwork_id = a.artwork_id 
         JOIN users u ON o.buyer_id = u.user_id
         WHERE a.artist_id = ? AND o.archived = 0
-        ORDER BY o.created_at DESC", 
+        ORDER BY o.created_at DESC limit 3", 
         [$artistId]
     );
 }
@@ -111,9 +156,48 @@ function getArtistArtworks($artistId, $limit = 10, $offset = 0) {
     global $db;
     
     return $db->select("
-        SELECT * FROM artworks 
-        WHERE artist_id = ? AND archived = 0
-        ORDER BY created_at DESC
+     SELECT 
+    a.artwork_id, 
+    a.artist_id, 
+    a.title, 
+    a.description, 
+    a.price,
+    a.category,
+    c.name AS category_name,
+    a.image_url, 
+    a.created_at, 
+    a.updated_at, 
+    a.moderation_status, 
+    a.is_for_auction, 
+    a.is_for_sale, 
+    a.archived,
+    au.auction_id,
+    au.start_time,
+    au.end_time AS auction_end_date,
+    au.starting_price AS starting_bid,
+    au.current_bid,
+    au.status AS auction_status,
+    COALESCE(b.bid_count, 0) AS bid_count
+FROM 
+    artworks a
+LEFT JOIN 
+    categories c ON a.category = c.category_id
+LEFT JOIN 
+    auctions au ON a.artwork_id = au.artwork_id AND au.archived = 0
+LEFT JOIN (
+    SELECT 
+        auction_id, 
+        COUNT(*) AS bid_count
+    FROM 
+        bids
+    GROUP BY 
+        auction_id
+) b ON b.auction_id = au.auction_id
+WHERE 
+    a.artist_id = ? 
+    AND a.archived = 0
+ORDER BY 
+    a.created_at DESC
        ", 
         [$artistId]
     );
@@ -138,6 +222,9 @@ function getCategories() {
 function getMessages($userId, $limit = 10, $offset = 0) {
     global $db;
     
+    $limit = (int)$limit;
+    $offset = (int)$offset;
+    
     return $db->select("
         SELECT m.*, 
                u_sender.email as sender_name,
@@ -147,8 +234,8 @@ function getMessages($userId, $limit = 10, $offset = 0) {
         JOIN users u_receiver ON m.receiver_id = u_receiver.user_id
         WHERE (m.sender_id = ? OR m.receiver_id = ?) AND m.archived = 0
         ORDER BY m.created_at DESC
-        LIMIT ? OFFSET ?", 
-        [$userId, $userId, $limit, $offset]
+        LIMIT $limit OFFSET $offset", 
+        [$userId, $userId]
     );
 }
 

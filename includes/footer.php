@@ -42,7 +42,11 @@
         </div>
     </div>
 </footer>
- 
+  <!-- Theme toggle floating button -->
+  <button id="theme-toggle" class="theme-toggle fixed bottom-6 right-6 z-50 shadow-lg">
+            <i class="fas fa-moon text-white" id="theme-icon"></i>
+        </button>
+
 
     <footer class="text-center p-6 mt-10 bg-black">
         <p>&copy; 2025 Art Gallery. All Rights Reserved.</p>

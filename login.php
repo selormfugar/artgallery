@@ -134,7 +134,7 @@
                 
                 // Redirect based on user role
                 if (response.data.role === 'admin') {
-                    window.location.href = 'admin/dashboard';
+                    window.location.href = 'admin/index.php';
                 }
                 else if (response.data.role === 'artist') {
                     window.location.href = 'artist/dashboard';

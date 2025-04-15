@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
+require_once '../includes/db.php';
 
 // Check if user is logged in and is an artist
 requireArtist();
@@ -8,29 +9,31 @@ requireArtist();
 // Get conversations
 global $db;
 $conversations = $db->select("
-    SELECT 
-        CASE 
-            WHEN m.sender_id = ? THEN m.receiver_id
-            ELSE m.sender_id
-        END as user_id,
-        u.email,
-        MAX(m.created_at) as last_message_time,
-        COUNT(CASE WHEN m.receiver_id = ? AND m.seen = 0 THEN 1 END) as unread_count
-    FROM messages m
-    JOIN users u ON (
-        CASE 
-            WHEN m.sender_id = ? THEN m.receiver_id
-            ELSE m.sender_id
-        END = u.user_id
-    )
-    WHERE (m.sender_id = ? OR m.receiver_id = ?) AND m.archived = 0
-    GROUP BY 
-        CASE 
-            WHEN m.sender_id = ? THEN m.receiver_id
-            ELSE m.sender_id
-        END,
-        u.email
-            ORDER BY last_message_time DESC", 
+   SELECT 
+    CASE 
+        WHEN m.sender_id = ? THEN m.receiver_id
+        ELSE m.sender_id
+    END AS user_id,
+    CONCAT(u.firstname, ' ', u.lastname) AS full_name,
+    MAX(m.created_at) AS last_message_time,
+    COUNT(CASE WHEN m.receiver_id = ? AND m.seen = 0 THEN 1 END) AS unread_count
+FROM messages m
+JOIN users u ON (
+    CASE 
+        WHEN m.sender_id = ? THEN m.receiver_id
+        ELSE m.sender_id
+    END = u.user_id
+)
+WHERE (m.sender_id = ? OR m.receiver_id = ?) AND m.archived = 0
+GROUP BY 
+    CASE 
+        WHEN m.sender_id = ? THEN m.receiver_id
+        ELSE m.sender_id
+    END,
+    u.firstname,
+    u.lastname
+ORDER BY last_message_time DESC
+", 
     [$_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']]
 );
 
@@ -64,8 +67,8 @@ include_once '../includes/sidebar.php';
                                     <div class="d-flex w-100 justify-content-between align-items-center">
                                         <div class="d-flex align-items-center">
                                             <div class="position-relative">
-                                                <img src="<?php echo !empty($conversation['profile_image']) ? UPLOAD_URL . $conversation['profile_image'] : SITE_URL . '/assets/img/user-placeholder.jpg'; ?>" 
-                                                     alt="<?php echo $conversation['email']; ?>" 
+                                                <img src="<?php echo !empty($conversation['profile_image']) ? UPLOAD_URL . $conversation['profile_image'] : SITE_URL . '/uploads/avatars/default.png'; ?>" 
+                                                     alt="<?php echo $conversation['full_name']; ?>" 
                                                      class="rounded-circle me-2" 
                                                      width="40" height="40">
                                                 <?php if ($conversation['unread_count'] > 0): ?>
@@ -75,7 +78,7 @@ include_once '../includes/sidebar.php';
                                                 <?php endif; ?>
                                             </div>
                                             <div>
-                                                <h6 class="mb-0"><?php echo $conversation['email']; ?></h6>
+                                                <h6 class="mb-0"><?php echo $conversation['full_name']; ?></h6>
                                                 <small class="text-muted">
                                                     <?php 
                                                     $lastMessageTime = strtotime($conversation['last_message_time']);
@@ -162,7 +165,7 @@ include_once '../includes/sidebar.php';
                                 );
                                 
                                 foreach ($buyers as $buyer) {
-                                    echo '<option value="' . $buyer['user_id'] . '">' . $buyer['email'] . '</option>';
+                                    echo '<option value="' . $buyer['user_id'] . '">' . $buyer['full_name'] . '</option>';
                                 }
                                 ?>
                             </select>
@@ -234,60 +237,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load messages function
     function loadMessages(userId, silent = false) {
-        fetch(`../api/messages.php?action=conversation&user_id=${userId}`)
-            .then(response => response.json())
-            .then(messages => {
-                if (!silent) {
-                    // Clear message container
-                    messageContainer.innerHTML = '';
-                }
-                
-                if (messages.length === 0) {
-                    messageContainer.innerHTML = `
-                        <div class="text-center p-5">
-                            <p>No messages yet. Start the conversation!</p>
+    fetch(`../api/messages.php?action=conversation&user_id=${userId}`)
+        .then(response => response.json())
+        .then(messages => {
+            if (!silent) {
+                messageContainer.innerHTML = '';
+            }
+
+            if (messages.length === 0) {
+                messageContainer.innerHTML = `
+                    <div class="text-center p-5">
+                        <p>No messages yet. Start the conversation.</p>
+                    </div>`;
+                return;
+            }
+
+            const messageHtml = messages.map(msg => {
+                const isSender = msg.sender_id == <?php echo $_SESSION['user_id']; ?>;
+                return `
+                    <div class="mb-2 d-flex ${isSender ? 'justify-content-end' : 'justify-content-start'}">
+                        <div class="p-2 rounded ${isSender ? 'bg-primary text-white' : 'bg-light'}" style="max-width: 75%;">
+                            <div>${msg.content}</div>
+                            <small class="text-muted d-block mt-1 text-end">${new Date(msg.created_at).toLocaleString()}</small>
                         </div>
-                    `;
-                    return;
-                }
-                
-                // Only update if there are new messages
-                if (silent && messageContainer.querySelectorAll('.message-bubble').length === messages.length) {
-                    return;
-                }
-                
-                // Clear container if silent update but new messages
-                if (silent) {
-                    messageContainer.innerHTML = '';
-                }
-                
-                // Add messages to container
-                messages.forEach(message => {
-                    const isCurrentUser = message.sender_id == <?php echo $_SESSION['user_id']; ?>;
-                    const messageClass = isCurrentUser ? 'message-sent' : 'message-received';
-                    const alignClass = isCurrentUser ? 'align-self-end' : 'align-self-start';
-                    const bgClass = isCurrentUser ? 'bg-primary text-white' : 'bg-light';
-                    
-                    messageContainer.innerHTML += `
-                        <div class="message-bubble ${messageClass} ${alignClass} mb-2 max-w-75">
-                            <div class="p-2 rounded ${bgClass}">
-                                ${message.content}
-                            </div>
-                            <small class="text-muted">
-                                ${new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </small>
-                        </div>
-                    `;
-                });
-                
-                // Scroll to bottom
-                messageContainer.scrollTop = messageContainer.scrollHeight;
-                
-                // Update unread count in sidebar
-                updateUnreadCount();
-            });
-    }
-    
+                    </div>`;
+            }).join('');
+
+            messageContainer.innerHTML = messageHtml;
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        })
+        .catch(error => {
+            console.error('Error loading messages:', error);
+        });
+}
+
     // Send message
     messageForm.addEventListener('submit', function(e) {
         e.preventDefault();

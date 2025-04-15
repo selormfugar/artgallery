@@ -372,16 +372,18 @@ function recordArtworkView($artworkId, $userId) {
         return $db->insert('artwork_views', $data);
     }
 }
-function getRecentlyViewedArtworks($userId, $limit = 5) {
+function getRecentlyViewedArtworks($userId, $limit = 3) {
     global $db;
 
     return $db->select("
-        SELECT a.*, av.viewed_at
+      SELECT a.*, av.viewed_at,u.email as artist_name
         FROM artwork_views av
         JOIN artworks a ON av.artwork_id = a.artwork_id
+         JOIN artists ar ON a.artist_id = ar.artist_id
+        JOIN users u ON ar.user_id = u.user_id
         WHERE av.user_id = ? AND a.archived = 0
         ORDER BY av.viewed_at DESC
-        LIMIT " .  (int)$limit,
+        LIMIT  " .  (int)$limit,
         [$userId]
     );
 }

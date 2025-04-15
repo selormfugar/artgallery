@@ -1,0 +1,5 @@
+unsubscribe   subscribe.php
+artit page artist Gallery.php
+    unsubcscribe feature
+    
+toggle light and dark mode

@@ -59,8 +59,8 @@ try {
         $_SESSION['firstname'] = $user['firstname'];
         $_SESSION['email'] = $user['email'];
 
-
-// Add debug logging
+// var_dump($_SESSION); // Debugging line to check session variables
+        // Add debug logging
            // Optional: Update last login time (if column exists)
         // try {
         //     $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");

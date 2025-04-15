@@ -36,11 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check for existing email
     try {
+        $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
         $checkEmailQuery = "SELECT COUNT(*) FROM users WHERE email = ?";
-        $checkStmt = $conn->prepare($checkEmailQuery);
+        $checkStmt = $pdo->prepare($checkEmailQuery);
         $checkStmt->execute([$email]);
         $emailCount = $checkStmt->fetchColumn();
-
+        
         if ($emailCount > 0) {
             $errors[] = 'Email already registered';
         }
@@ -49,48 +52,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($errors)) {
             http_response_code(400);
             echo json_encode([
-                'success' => false, 
+                'success' => false,
                 'errors' => $errors
             ]);
             exit;
         }
 
-        // Hash the password (uses same method as login processor)
+        // Hash the password
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
         // Insert into database
         $query = "INSERT INTO users (firstname, lastname, email, password_hash, role) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($query);
+        $stmt = $pdo->prepare($query);
         $stmt->execute([
-            $firstname, 
-            $lastname, 
-            $email, 
-            $hashedPassword, 
+            $firstname,
+            $lastname,
+            $email,
+            $hashedPassword,
             $role
         ]);
 
         // Retrieve the newly created user
-        $userId = $conn->lastInsertId();
+        $userId = $pdo->lastInsertId();
         $query = "SELECT user_id, firstname, lastname, email, role, created_at, archived FROM users WHERE user_id = ?";
-        $stmt = $conn->prepare($query);
+        $stmt = $pdo->prepare($query);
         $stmt->execute([$userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Successful registration response
         echo json_encode([
-            'success' => true, 
+            'success' => true,
             'message' => 'User registered successfully',
             'user' => $user
         ]);
-
+        
     } catch (PDOException $e) {
         // Log the error (in a production environment)
         error_log('Registration error: ' . $e->getMessage());
-
+        
         // Return generic error to client
         http_response_code(500);
         echo json_encode([
-            'success' => false, 
+            'success' => false,
             'message' => 'An error occurred during registration'
         ]);
     }
@@ -98,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Invalid request method
     http_response_code(405);
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Method Not Allowed'
     ]);
 }

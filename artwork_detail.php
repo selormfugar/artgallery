@@ -39,7 +39,7 @@ try {
 // Check if artwork is in user's wishlist
 $in_wishlist = false;
 if (isset($_SESSION['user_id'])) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = ? AND artwork_id = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM wishlists WHERE user_id = ? AND artwork_id = ?");
     $stmt->execute([$_SESSION['user_id'], $artwork['artwork_id']]);
     $in_wishlist = $stmt->fetchColumn() > 0;
 }
@@ -115,7 +115,13 @@ try {
 
 <body class="<?= isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'dark-mode' : '' ?>">
     <?php require_once 'includes/navbar.php'; ?>
- <nav class="flex mb-6" aria-label="Breadcrumb">
+ <!-- Theme toggle floating button -->
+ <button id="theme-toggle" class="theme-toggle fixed bottom-6 right-6 z-50 shadow-lg">
+            <i class="fas fa-moon text-white" id="theme-icon"></i>
+        </button>
+
+    <main class="max-w-7xl mx-auto px-4 py-12">
+    <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
                     <a href="gallery.php" class="text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Gallery</a>
@@ -128,8 +134,6 @@ try {
                 </li>
             </ol>
         </nav>
-    <main class="max-w-7xl mx-auto px-4 py-12">
-        <!-- Breadcrumbs -->
        
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto px-4">
@@ -171,13 +175,13 @@ try {
     </div>
     
     <!-- Optional: Thumbnail Navigation (if you add multiple images later) -->
-    <div class="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+    <!-- <div class="mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
         <div class="flex space-x-3 overflow-x-auto py-2 scrollbar-hide">
             <button class="w-14 h-14 rounded-lg overflow-hidden border-2 border-transparent hover:border-[#b8895c] transition-all">
                 <div class="w-full h-full bg-[#2e2e2e] animate-pulse"></div>
             </button>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <script>
@@ -221,13 +225,16 @@ document.getElementById('main-artwork-image').addEventListener('load', function(
                     <span>Place Bid</span>
                 </a>
             <?php else: ?>
-                <button onclick="addToCart(<?= $artwork['artwork_id'] ?>)" 
-                        class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center justify-center space-x-2 shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                    </svg>
-                    <span>Add to Cart</span>
-                </button>
+                <button onclick="purchaseArtwork(<?= $artwork['artwork_id'] ?>)" 
+    class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition flex items-center justify-center space-x-2 shadow-md">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+    </svg>
+    <span>Purchase Now</span>
+</button>
+
+<!-- Notification Container (add to your layout) -->
+<div id="notification-container" class="fixed top-4 right-4 z-50 w-80 space-y-2"></div>
             <?php endif; ?>
             
             <button onclick="addToWishlist(<?= $artwork['artwork_id'] ?>)" 
@@ -394,17 +401,53 @@ function addToWishlist(artworkId) {
  * Actual wishlist addition process
  * @param {number} artworkId - ID of the artwork to add
  */
+
+// function addToWishlistProcess(artworkId) {
+//     // Get artwork ID from URL if not provided
+//     if (!artworkId) {
+//         const urlParams = new URLSearchParams(window.location.search);
+//         artworkId = urlParams.get('id');
+//     }
+
+//     return fetch('api/add_to_wishlist.php', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//             artwork_id: artworkId,
+//             csrf_token: getCsrfToken()
+//         })
+//     }).then(response => response.json());
+// }
+
+
+// Function to add artwork to wishlist
 function addToWishlistProcess(artworkId) {
-    return fetch('api/add_to_wishlist.php', {
+    // Get artwork ID from URL if not provided
+    // if (!artworkId) {
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     artworkId = urlParams.get('id');
+    // }
+    fetch('api/add_to_wishlist.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            artwork_id: artworkId,
-            csrf_token: getCsrfToken()
-        })
-    }).then(response => response.json());
+        body: JSON.stringify({ artwork_id: artworkId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+        } else if (data.error) {
+            showNotification(data.error, 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('An error occurred while processing your request', 'error');
+        console.error('Error:', error);
+    });
 }
 
 /**
@@ -461,15 +504,25 @@ function updateWishlistCount(count) {
 /**
  * Show success notification
  */
-function showWishlistSuccess(message) {
-    // Replace with your preferred notification system
+
+// Unified notification function for both success and error messages
+function showNotification(message, type) {
     const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg';
+    
+    // Set styles based on notification type
+    if (type === 'success') {
+        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+    } else {
+        notification.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50';
+    }
+    
     notification.textContent = message;
     document.body.appendChild(notification);
     
+    // Auto-remove after 3 seconds
     setTimeout(() => {
-        notification.remove();
+        notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
@@ -606,29 +659,100 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add to cart function
-    function addToCart(artworkId) {
-        $.ajax({
-            url: 'api/add_to_cart.php',
-            type: 'POST',
-            data: { artwork_id: artworkId },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    alert('Artwork added to cart!');
-                    // Update cart count in navbar if you have one
-                    if (response.cart_count) {
-                        $('#cart-count').text(response.cart_count);
-                    }
-                } else {
-                    alert(response.message || 'Failed to add to cart');
+function purchaseArtwork(artworkId) {
+    $.ajax({
+        url: 'api/purchase_artwork.php',
+        type: 'POST',
+        data: { artwork_id: artworkId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                showNotification({
+                    type: 'success',
+                    title: 'Purchase Successful',
+                    message: response.message,
+                    autoClose: true
+                });
+                
+                // Update UI if needed
+                if (response.order_id) {
+                    // Optionally redirect to order confirmation
+                    // window.location.href = `/order-confirmation.php?id=${response.order_id}`;
                 }
-            },
-            error: function() {
-                alert('Error communicating with server');
+                
+                // Update any subscription info if applicable
+                if (response.subscription_discount_applied) {
+                    showNotification({
+                        type: 'info',
+                        title: 'Discount Applied',
+                        message: `Your subscription saved you ${response.discount_amount}!`,
+                        autoClose: true
+                    });
+                }
+            } else {
+                showNotification({
+                    type: 'error',
+                    title: 'Purchase Failed',
+                    message: response.message || 'Failed to complete purchase',
+                    autoClose: true
+                });
             }
-        });
+        },
+        error: function() {
+            showNotification({
+                type: 'error',
+                title: 'Error',
+                message: 'Error communicating with server',
+                autoClose: true
+            });
+        }
+    });
+}
+
+// Notification system
+function showNotification({ type = 'info', title, message, autoClose = true, duration = 5000 }) {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    
+    // Base classes
+    let classes = 'p-4 rounded-lg shadow-lg border-l-4 ';
+    
+    // Type-specific classes
+    switch(type) {
+        case 'success':
+            classes += 'bg-green-50 border-green-500 text-green-700';
+            break;
+        case 'error':
+            classes += 'bg-red-50 border-red-500 text-red-700';
+            break;
+        case 'warning':
+            classes += 'bg-yellow-50 border-yellow-500 text-yellow-700';
+            break;
+        default:
+            classes += 'bg-blue-50 border-blue-500 text-blue-700';
     }
+    
+    notification.className = classes;
+    notification.innerHTML = `
+        <div class="flex justify-between items-start">
+            <div>
+                <h3 class="font-bold">${title}</h3>
+                <p class="text-sm">${message}</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(notification);
+    
+    if (autoClose) {
+        setTimeout(() => {
+            notification.remove();
+        }, duration);
+    }
+}
 
     // Initialize when page loads
     $(document).ready(function() {

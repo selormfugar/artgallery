@@ -4,7 +4,7 @@ require_once 'includes/auth_check.php';
 
 // After successful login in your login.php:
 if (isset($_SESSION['user_id'])) {
-    echo '<script>checkPendingWishlistItem();</script>';
+    // echo '<script>checkPendingWishlistItem();</script>';
     
     // Or if you're redirecting back:
     if (isset($_GET['redirect'])) {
@@ -22,6 +22,10 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- Navigation Menu -->
     <?php require_once 'includes/navbar.php'; ?>
+ <!-- Theme toggle floating button -->
+ <button id="theme-toggle" class="theme-toggle fixed bottom-6 right-6 z-50 shadow-lg">
+            <i class="fas fa-moon text-white" id="theme-icon"></i>
+        </button>
 
     <!-- Gallery Section -->
     <section class="max-w-7xl mx-auto px-6 py-16">
@@ -176,9 +180,38 @@ if (isset($_SESSION['user_id'])) {
             color: white;
             border-color: #3b82f6;
             }
+
+
+            @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.animate-pulse {
+    animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.transition-all {
+    transition-property: all;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+.ease-in-out {
+    transition-timing-function: ease-in-out;
+}
         </style>
     
-        
+        <!-- Notification container (place this in your layout file) -->
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 w-80 max-w-full"></div>
+
+<!-- Cart count element (example) -->
+<!-- <a href="/cart" class="relative">
+    <span>Cart</span>
+    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+</a> -->
         <!-- Load More Button -->
         <div class="text-center mt-8">
             <button id="load-more" class="bg-gray-800 text-white px-6 py-3 rounded hover:bg-gray-700 transition">
@@ -187,257 +220,440 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- After jQuery but before your other scripts -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="<?php echo SITE_URL; ?>/assets/js/wishlist.js"></script>
         <script src="<?php echo SITE_URL; ?>/assets/js/main.js"></script>
         <script>
-$(document).ready(function() {
-    // Variables for pagination and loading
-    let currentPage = 1;
-    let isLoading = false;
-    let hasMore = true;
-    
-    // Filter state object
-    let filters = {
-        category: '',
-        price: '',
-        sort: 'newest',
-        search: ''
-    };
-    
-    // Initialize
-    loadArtworks();
-    updateActiveFilters();
-    
-    // Debounce function
-    function debounce(func, wait) {
-        let timeout;
-        return function() {
-            const context = this, args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                func.apply(context, args);
-            }, wait);
-        };
-    }
-    
-    // Load artworks function
-    function loadArtworks(reset = false) {
-        if (isLoading || !hasMore) return;
-        
-        isLoading = true;
-        $('#loading').removeClass('hidden');
-        $('#loading-indicator').removeClass('hidden');
-        
-        if (reset) {
-            currentPage = 1;
-            $('#gallery-grid').empty();
-            hasMore = true;
-        }
-        
-        // Update filters from UI
-        filters = {
-            category: $('#category-filter').val(),
-            price: $('#price-filter').val(),
-            sort: $('#sort-filter').val(),
-            search: $('#search-input').val().trim()
-        };
-        
-        // Add pagination parameter
-        const requestData = {
-            ...filters,
-            page: currentPage
-        };
-        
-        $.ajax({
-            url: 'api/get_artworks.php',
-            type: 'GET',
-            data: requestData,
-            dataType: 'json',
-            success: function(data) {
-                if (data.artworks.length === 0) {
-                    if (currentPage === 1) {
-                        $('#gallery-grid').html(
-                            '<div class="col-span-full text-center py-8">No artworks found matching your criteria.</div>'
-                        );
+            $(document).ready(function() {
+                // Variables for pagination and loading
+                let currentPage = 1;
+                let isLoading = false;
+                let hasMore = true;
+                
+                // Filter state object
+                let filters = {
+                    category: '',
+                    price: '',
+                    sort: 'newest',
+                    search: ''
+                };
+                
+                // Initialize
+                loadArtworks();
+                updateActiveFilters();
+                
+                // Debounce function
+                function debounce(func, wait) {
+                    let timeout;
+                    return function() {
+                        const context = this, args = arguments;
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            func.apply(context, args);
+                        }, wait);
+                    };
+                }
+                
+                // Load artworks function
+                function loadArtworks(reset = false) {
+                    if (isLoading || !hasMore) return;
+                    
+                    isLoading = true;
+                    $('#loading').removeClass('hidden');
+                    $('#loading-indicator').removeClass('hidden');
+                    
+                    if (reset) {
+                        currentPage = 1;
+                        $('#gallery-grid').empty();
+                        hasMore = true;
                     }
-                    hasMore = false;
-                    $('#load-more').hide();
-                } else {
-                    displayArtworks(data.artworks);
-                    currentPage++;
-                    if (!data.has_more) {
-                        hasMore = false;
-                        $('#load-more').hide();
-                    } else {
-                        $('#load-more').show();
+                    
+                    // Update filters from UI
+                    filters = {
+                        category: $('#category-filter').val(),
+                        price: $('#price-filter').val(),
+                        sort: $('#sort-filter').val(),
+                        search: $('#search-input').val().trim()
+                    };
+                    
+                    // Add pagination parameter
+                    const requestData = {
+                        ...filters,
+                        page: currentPage
+                    };
+                    
+                    $.ajax({
+                        url: 'api/get_artworks.php',
+                        type: 'GET',
+                        data: requestData,
+                        dataType: 'json',
+                        success: function(data) {
+                            if (data.artworks.length === 0) {
+                                if (currentPage === 1) {
+                                    $('#gallery-grid').html(
+                                        '<div class="col-span-full text-center py-8">No artworks found matching your criteria.</div>'
+                                    );
+                                }
+                                hasMore = false;
+                                $('#load-more').hide();
+                            } else {
+                                displayArtworks(data.artworks);
+                                currentPage++;
+                                if (!data.has_more) {
+                                    hasMore = false;
+                                    $('#load-more').hide();
+                                } else {
+                                    $('#load-more').show();
+                                }
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Error loading artworks:", error);
+                            $('#gallery-grid').html(
+                                '<div class="col-span-full text-center py-8 text-red-500">Error loading artworks. Please try again.</div>'
+                            );
+                        },
+                        complete: function() {
+                            isLoading = false;
+                            $('#loading').addClass('hidden');
+                            $('#loading-indicator').addClass('hidden');
+                        }
+                    });
+                }
+
+                // add to cart function
+                function addToCart(artworkId) {
+                    $.ajax({
+                        url: 'api/purchase_artwork.php', // Fixed typo in URL (was 'purchare_artwork.php')
+                        type: 'POST',
+                        data: { artwork_id: artworkId },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                showNotification({
+                                    type: 'success',
+                                    title: 'Purchase Successful',
+                                    message: response.message,
+                                    autoClose: true,
+                                    duration: 5000
+                                });
+                                
+                                // Optional: Update cart count in UI
+                                updateCartCount();
+                                
+                            } else {
+                                showNotification({
+                                    type: 'error',
+                                    title: 'Purchase Failed',
+                                    message: response.message || 'Failed to complete purchase',
+                                    autoClose: true,
+                                    duration: 5000
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            showNotification({
+                                type: 'error',
+                                title: 'Server Error',
+                                message: 'Error communicating with server. Please try again.',
+                                autoClose: true,
+                                duration: 5000
+                            });
+                            console.error('AJAX Error:', status, error);
+                        }
+                    });
+                }
+
+                // Enhanced notification system with animations and stacking
+                function showNotification({ type = 'info', title, message, autoClose = true, duration = 5000 }) {
+                    const container = document.getElementById('notification-container');
+                    if (!container) {
+                        console.error('Notification container not found');
+                        return;
+                    }
+
+                    const notification = document.createElement('div');
+                    
+                    // Base classes
+                    let classes = 'p-4 rounded-lg shadow-lg border-l-4 mb-2 transform transition-all duration-300 ease-in-out ';
+                    
+                    // Start hidden and slide in
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    
+                    // Type-specific classes
+                    switch(type) {
+                        case 'success':
+                            classes += 'bg-green-50 border-green-500 text-green-700';
+                            break;
+                        case 'error':
+                            classes += 'bg-red-50 border-red-500 text-red-700';
+                            break;
+                        case 'warning':
+                            classes += 'bg-yellow-50 border-yellow-500 text-yellow-700';
+                            break;
+                        default:
+                            classes += 'bg-blue-50 border-blue-500 text-blue-700';
+                    }
+                    
+                    notification.className = classes;
+                    notification.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold">${title}</h3>
+                                <p class="text-sm">${message}</p>
+                            </div>
+                            <button onclick="this.parentElement.parentElement.remove()" 
+                                    class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                &times;
+                            </button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(notification);
+                    
+                    // Trigger animation
+                    setTimeout(() => {
+                        notification.style.opacity = '1';
+                        notification.style.transform = 'translateX(0)';
+                    }, 10);
+                    
+                    if (autoClose) {
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                            notification.style.transform = 'translateX(100%)';
+                            setTimeout(() => notification.remove(), 300);
+                        }, duration);
                     }
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error loading artworks:", error);
-                $('#gallery-grid').html(
-                    '<div class="col-span-full text-center py-8 text-red-500">Error loading artworks. Please try again.</div>'
-                );
-            },
-            complete: function() {
-                isLoading = false;
-                $('#loading').addClass('hidden');
-                $('#loading-indicator').addClass('hidden');
-            }
-        });
-    }
-    
-    // Display artworks in grid
-    function displayArtworks(artworks) {
-        artworks.forEach(artwork => {
-            // Fix image path - use the full URL from your config
-            const imagePath = '<?php echo SITE_URL; ?>/images/' + artwork.image_url;
+
+                // Display artworks in grid
+                function displayArtworks(artworks) {
+                    artworks.forEach(artwork => {
+                        // Fix image path - use the full URL from your config
+                        const imagePath = '<?php echo SITE_URL; ?>/images/' + artwork.image_url;
+                        
+                        const artworkHtml = `
+                            <div class="gallery-item">
+                                <img src="${imagePath}" alt="${artwork.title.replace(/"/g, '&quot;')}" onerror="this.src='<?php echo SITE_URL; ?>/images/art10.jpg'">
+                                <div class="overlay">
+                                    <h3 class="text-xl font-bold mb-2">${artwork.title.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
+                                    <p class="mb-2">${artwork.description ? artwork.description.substring(0, 100).replace(/</g, '&lt;').replace(/>/g, '&gt;') + (artwork.description.length > 100 ? '...' : '') : 'No description available'}</p>
+                                    <p class="text-sm mb-4">By: ${artwork.artist_name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                                    <div class="flex space-x-2">
+                                        <a href="artwork_detail.php?id=${artwork.artwork_id}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">View Details</a>
+                                        ${artwork.is_for_auction ? 
+                                            `<a href="auction_detail.php?id=${artwork.artwork_id}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition">View Auction</a>` : 
+                                            `<button class="purchase-btn bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition" 
+                    data-artwork-id="${artwork.artwork_id}">
+                Purchase Now
+            </button>`                            } 
+                                    </div>
+                                </div>
+                                <div class="artwork-info">
+                                    <p class="font-bold mt-2">$${parseFloat(artwork.price).toFixed(2)}</p>
+                                </div>
+                            </div>
+                        `;
+                        $('#gallery-grid').append(artworkHtml);
+                    });
+                }
             
-            const artworkHtml = `
-                <div class="gallery-item">
-                    <img src="${imagePath}" alt="${artwork.title.replace(/"/g, '&quot;')}" onerror="this.src='<?php echo SITE_URL; ?>/images/art10.jpg'">
-                    <div class="overlay">
-                        <h3 class="text-xl font-bold mb-2">${artwork.title.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
-                        <p class="mb-2">${artwork.description ? artwork.description.substring(0, 100).replace(/</g, '&lt;').replace(/>/g, '&gt;') + (artwork.description.length > 100 ? '...' : '') : 'No description available'}</p>
-                        <p class="text-sm mb-4">By: ${artwork.artist_name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
-                        <div class="flex space-x-2">
-                            <a href="artwork_detail.php?id=${artwork.artwork_id}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">View Details</a>
-                            ${artwork.is_for_auction ? 
-                                `<a href="auction.php?id=${artwork.auction_id}" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition">View Auction</a>` : 
-                                `<button onclick="addToCart(${artwork.artwork_id})" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Add to Cart</button>`
+                $(document).ready(function() {
+                    // Event delegation for purchase buttons (works for dynamically added elements)
+                    $(document).on('click', '.purchase-btn', function() {
+                        const artworkId = $(this).data('artwork-id');
+                        purchaseArtwork(artworkId);
+                    });
+                });
+
+
+                // purchase artwork function
+                function purchaseArtwork(artworkId) {
+                    console.log('Attempting to purchase artwork ID:', artworkId); // Debugging
+                    
+                    $.ajax({
+                        url: 'api/purchase_artwork.php',
+                        type: 'POST',
+                        data: { artwork_id: artworkId },
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Purchase response:', response); // Debugging
+                            if (response.status === 'success') {
+                                showNotification({
+                                    type: 'success',
+                                    title: 'Purchase Successful',
+                                    message: response.message,
+                                    autoClose: true
+                                });
+                                
+                                if (response.order_id) {
+                                    // Optionally redirect to order confirmation
+                                    // window.location.href = `/order-confirmation.php?id=${response.order_id}`;
+                                }
+                                
+                                if (response.subscription_discount_applied) {
+                                    showNotification({
+                                        type: 'info',
+                                        title: 'Discount Applied',
+                                        message: `Your subscription saved you ${response.discount_amount}!`,
+                                        autoClose: true
+                                    });
+                                }
+                            } else {
+                                showNotification({
+                                    type: 'error',
+                                    title: 'Purchase Failed',
+                                    message: response.message || 'Failed to complete purchase',
+                                    autoClose: true
+                                });
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Purchase error:', status, error); // Debugging
+                            showNotification({
+                                type: 'error',
+                                title: 'Error',
+                                message: 'Error communicating with server',
+                                autoClose: true
+                            });
+                        }
+                    });
+                }
+                    
+                // Function to update active filters display
+                function updateActiveFilters() {
+                    $('#active-filters').html('<span class="text-sm text-gray-700 mr-2">Active filters:</span>');
+                    let hasActiveFilters = false;
+
+                    // Category filter
+                    if ($('#category-filter').val()) {
+                        const selectedCategory = $('#category-filter option:selected').text();
+                        addActiveFilterBadge('Category: ' + selectedCategory, 'category');
+                        hasActiveFilters = true;
+                    }
+
+                    // Price filter
+                    if ($('#price-filter').val()) {
+                        const priceText = $('#price-filter option:selected').text();
+                        addActiveFilterBadge('Price: ' + priceText, 'price');
+                        hasActiveFilters = true;
+                    }
+
+                    // Sort filter (if not default)
+                    if ($('#sort-filter').val() !== 'newest') {
+                        const sortText = $('#sort-filter option:selected').text();
+                        addActiveFilterBadge('Sort: ' + sortText, 'sort');
+                        hasActiveFilters = true;
+                    }
+
+                    // Search term
+                    if ($('#search-input').val().trim()) {
+                        addActiveFilterBadge('Search: "' + $('#search-input').val().trim() + '"', 'search');
+                        hasActiveFilters = true;
+                    }
+
+                    // Show/hide active filters container
+                    $('#active-filters').toggle(hasActiveFilters);
+                }
+
+                // Function to add a filter badge
+                function addActiveFilterBadge(text, type) {
+                    const badge = $(`
+                        <div class="flex items-center bg-[#b8895c] bg-opacity-20 text-[#9a6b42] px-3 py-1 rounded-full text-sm">
+                            ${text}
+                            <button data-type="${type}" class="ml-2 text-[#9a6b42] hover:text-[#7a542f] focus:outline-none">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                    </div>
-                    <div class="artwork-info">
-                        <p class="font-bold mt-2">$${parseFloat(artwork.price).toFixed(2)}</p>
-                    </div>
-                </div>
-            `;
-            $('#gallery-grid').append(artworkHtml);
-        });
+                    `);
+                    $('#active-filters').append(badge);
+                }
+
+                // Load more button click
+                $('#load-more').click(function() {
+                    loadArtworks();
+                });
+                
+                // Filter change events
+                $('#category-filter, #price-filter, #sort-filter').change(function() {
+                    updateActiveFilters();
+                    loadArtworks(true);
+                });
+                
+                // Search input with debounce
+                $('#search-input').on('input', debounce(function() {
+                    updateActiveFilters();
+                    loadArtworks(true);
+                }, 300));
+                
+                // Reset all filters
+                $('#reset-filters').click(function() {
+                    $('#category-filter').val('');
+                    $('#price-filter').val('');
+                    $('#sort-filter').val('newest');
+                    $('#search-input').val('');
+                    updateActiveFilters();
+                    loadArtworks(true);
+                });
+                
+                // Remove individual filter
+                $('#active-filters').on('click', 'button[data-type]', function() {
+                    const filterType = $(this).data('type');
+                    
+                    switch(filterType) {
+                        case 'category':
+                            $('#category-filter').val('');
+                            break;
+                        case 'price':
+                            $('#price-filter').val('');
+                            break;
+                        case 'sort':
+                            $('#sort-filter').val('newest');
+                            break;
+                        case 'search':
+                            $('#search-input').val('');
+                            break;
+                    }
+                    
+                    updateActiveFilters();
+                    loadArtworks(true);
+                });
+                });
+
+
+ // Dark/Light mode toggle functionality
+ const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const html = document.documentElement;
+    
+    // Check for saved user preference or use system preference
+    const savedTheme = localStorage.getItem('theme') || 
+                      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    
+    // Apply the saved theme
+    if (savedTheme === 'dark') {
+        html.classList.add('dark');
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+    } else {
+        html.classList.remove('dark');
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
     }
     
-    // Function to update active filters display
-    function updateActiveFilters() {
-        $('#active-filters').html('<span class="text-sm text-gray-700 mr-2">Active filters:</span>');
-        let hasActiveFilters = false;
-
-        // Category filter
-        if ($('#category-filter').val()) {
-            const selectedCategory = $('#category-filter option:selected').text();
-            addActiveFilterBadge('Category: ' + selectedCategory, 'category');
-            hasActiveFilters = true;
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            localStorage.setItem('theme', 'dark');
         }
-
-        // Price filter
-        if ($('#price-filter').val()) {
-            const priceText = $('#price-filter option:selected').text();
-            addActiveFilterBadge('Price: ' + priceText, 'price');
-            hasActiveFilters = true;
-        }
-
-        // Sort filter (if not default)
-        if ($('#sort-filter').val() !== 'newest') {
-            const sortText = $('#sort-filter option:selected').text();
-            addActiveFilterBadge('Sort: ' + sortText, 'sort');
-            hasActiveFilters = true;
-        }
-
-        // Search term
-        if ($('#search-input').val().trim()) {
-            addActiveFilterBadge('Search: "' + $('#search-input').val().trim() + '"', 'search');
-            hasActiveFilters = true;
-        }
-
-        // Show/hide active filters container
-        $('#active-filters').toggle(hasActiveFilters);
-    }
-
-    // Function to add a filter badge
-    function addActiveFilterBadge(text, type) {
-        const badge = $(`
-            <div class="flex items-center bg-[#b8895c] bg-opacity-20 text-[#9a6b42] px-3 py-1 rounded-full text-sm">
-                ${text}
-                <button data-type="${type}" class="ml-2 text-[#9a6b42] hover:text-[#7a542f] focus:outline-none">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `);
-        $('#active-filters').append(badge);
-    }
-
-    // Load more button click
-    $('#load-more').click(function() {
-        loadArtworks();
     });
     
-    // Filter change events
-    $('#category-filter, #price-filter, #sort-filter').change(function() {
-        updateActiveFilters();
-        loadArtworks(true);
-    });
-    
-    // Search input with debounce
-    $('#search-input').on('input', debounce(function() {
-        updateActiveFilters();
-        loadArtworks(true);
-    }, 300));
-    
-    // Reset all filters
-    $('#reset-filters').click(function() {
-        $('#category-filter').val('');
-        $('#price-filter').val('');
-        $('#sort-filter').val('newest');
-        $('#search-input').val('');
-        updateActiveFilters();
-        loadArtworks(true);
-    });
-    
-    // Remove individual filter
-    $('#active-filters').on('click', 'button[data-type]', function() {
-        const filterType = $(this).data('type');
-        
-        switch(filterType) {
-            case 'category':
-                $('#category-filter').val('');
-                break;
-            case 'price':
-                $('#price-filter').val('');
-                break;
-            case 'sort':
-                $('#sort-filter').val('newest');
-                break;
-            case 'search':
-                $('#search-input').val('');
-                break;
-        }
-        
-        updateActiveFilters();
-        loadArtworks(true);
-    });
-});
-
-function addToCart(artworkId) {
-    $.ajax({
-        url: 'api/add_to_cart.php',
-        type: 'POST',
-        data: { artwork_id: artworkId },
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                alert('Artwork added to cart!');
-            } else {
-                alert(response.message || 'Failed to add to cart');
-            }
-        },
-        error: function() {
-            alert('Error communicating with server');
-        }
-    });
-}
 </script>
     <?php require_once 'includes/footer.php'; ?>
 

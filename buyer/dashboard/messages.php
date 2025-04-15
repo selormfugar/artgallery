@@ -3,7 +3,7 @@ require_once '../includes/config.php';
 require_once '../includes/functions.php';
 
 // Check if user is logged in and is an artist
-requireArtist();
+// requireArtist();
 
 // Get conversations
 global $db;
@@ -13,7 +13,7 @@ $conversations = $db->select("
             WHEN m.sender_id = ? THEN m.receiver_id
             ELSE m.sender_id
         END as user_id,
-        u.username,
+        u.email,
         u.profile_image,
         MAX(m.created_at) as last_message_time,
         COUNT(CASE WHEN m.receiver_id = ? AND m.seen = 0 THEN 1 END) as unread_count
@@ -30,7 +30,7 @@ $conversations = $db->select("
             WHEN m.sender_id = ? THEN m.receiver_id
             ELSE m.sender_id
         END,
-        u.username,
+        u.email,
         u.profile_image
     ORDER BY last_message_time DESC", 
     [$_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']]
@@ -67,7 +67,7 @@ include_once '../includes/sidebar.php';
                                         <div class="d-flex align-items-center">
                                             <div class="position-relative">
                                                 <img src="<?php echo !empty($conversation['profile_image']) ? UPLOAD_URL . $conversation['profile_image'] : SITE_URL . '/assets/img/user-placeholder.jpg'; ?>" 
-                                                     alt="<?php echo $conversation['username']; ?>" 
+                                                     alt="<?php echo $conversation['email']; ?>" 
                                                      class="rounded-circle me-2" 
                                                      width="40" height="40">
                                                 <?php if ($conversation['unread_count'] > 0): ?>
@@ -77,7 +77,7 @@ include_once '../includes/sidebar.php';
                                                 <?php endif; ?>
                                             </div>
                                             <div>
-                                                <h6 class="mb-0"><?php echo $conversation['username']; ?></h6>
+                                                <h6 class="mb-0"><?php echo $conversation['email']; ?></h6>
                                                 <small class="text-muted">
                                                     <?php 
                                                     $lastMessageTime = strtotime($conversation['last_message_time']);
@@ -154,17 +154,17 @@ include_once '../includes/sidebar.php';
                                 <?php
                                 // Get list of buyers who have purchased from this artist
                                 $buyers = $db->select("
-                                    SELECT DISTINCT u.user_id, u.username
+                                    SELECT DISTINCT u.user_id, u.email
                                     FROM users u
                                     JOIN orders o ON u.user_id = o.buyer_id
                                     JOIN artworks a ON o.artwork_id = a.artwork_id
                                     WHERE a.artist_id = ? AND u.archived = 0
-                                    ORDER BY u.username", 
+                                    ORDER BY u.email", 
                                     [$_SESSION['artist_id']]
                                 );
                                 
                                 foreach ($buyers as $buyer) {
-                                    echo '<option value="' . $buyer['user_id'] . '">' . $buyer['username'] . '</option>';
+                                    echo '<option value="' . $buyer['user_id'] . '">' . $buyer['email'] . '</option>';
                                 }
                                 ?>
                             </select>
